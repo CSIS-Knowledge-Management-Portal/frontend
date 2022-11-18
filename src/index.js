@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
-import { MantineProvider, Button } from "@mantine/core";
+import { MantineProvider } from "@mantine/core";
 import { CustomFont } from "./utils/CustomFont";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));

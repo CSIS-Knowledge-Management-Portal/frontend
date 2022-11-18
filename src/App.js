@@ -1,10 +1,18 @@
-import CustomDiv from "./components/CustomDiv";
+import Container from "./components/Container";
+import Homepage from "./pages/Homepage";
+import Navbar from "./components/Navbar";
+import PastTripsPage from "./pages/PastTripsPage";
 
 function App() {
   return (
-    <div className="App">
-      <CustomDiv />
-    </div>
+    <>
+      <Navbar />
+      <div className="App">
+        <Container>
+          <PastTripsPage />
+        </Container>
+      </div>
+    </>
   );
 }
 

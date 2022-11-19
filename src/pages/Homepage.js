@@ -29,6 +29,16 @@ const useStyles = createStyles((theme) => ({
     "&:hover": {
       opacity: 1,
     },
+
+    [`@media (max-width: ${theme.breakpoints.xl}px)`]: {
+      height: 70,
+    },
+    [`@media (max-width: ${theme.breakpoints.lg}px)`]: {
+      height: 60,
+    },
+    [`@media (max-width: ${theme.breakpoints.md}px)`]: {
+      height: 50,
+    },
   },
 
   sidePanel: {

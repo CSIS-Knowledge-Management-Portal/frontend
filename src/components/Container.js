@@ -8,6 +8,7 @@ const useStyles = createStyles((theme) => ({
     marginLeft: "auto",
     marginRight: "auto",
     width: "1320px",
+    padding: 10,
 
     [`@media (max-width: ${theme.breakpoints.xl}px)`]: {
       width: "1140px",

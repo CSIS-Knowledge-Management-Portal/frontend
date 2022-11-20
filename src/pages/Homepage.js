@@ -74,7 +74,7 @@ function Homepage() {
           Hi, Shivansh!
         </Text>
       </div>
-      <Grid gutter={40}>
+      <Grid>
         <Grid.Col xs={12} md={7}>
           {[1, 1, 1, 1, 1, 1, 1].map((item, id) => (
             <CustomDiv key={id} type={1} />

@@ -8,7 +8,8 @@ import {
   createStyles,
   Text,
 } from "@mantine/core";
-import { IconCheck, IconX } from "@tabler/icons";
+import { IconCheck, IconEdit, IconX } from "@tabler/icons";
+import { useNavigate } from "react-router";
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -188,6 +189,7 @@ const useStyles = createStyles((theme) => ({
 export default function CustomDiv({ type, item }) {
   const { classes } = useStyles();
   const [showDetails, setShowDetails] = React.useState(false);
+  let navigate = useNavigate();
 
   switch (type) {
     case 1:
@@ -256,7 +258,12 @@ export default function CustomDiv({ type, item }) {
         <Card withBorder className={classes.wrapper}>
           <CardSection className={classes.titleBox}>
             <Text>Approval Pending</Text>
-            <Text style={{ cursor: "pointer" }}>View All</Text>
+            <Text
+              style={{ cursor: "pointer" }}
+              onClick={() => navigate("/pending-approval")}
+            >
+              View All
+            </Text>
           </CardSection>
           <div className={classes.itemList}>
             {[1, 1, 1, 1, 1].map(() => (
@@ -325,7 +332,12 @@ export default function CustomDiv({ type, item }) {
         <Card withBorder className={classes.wrapper}>
           <CardSection className={classes.titleBox}>
             <Text>Upcoming Trips</Text>
-            <Text style={{ cursor: "pointer" }}>View All</Text>
+            <Text
+              style={{ cursor: "pointer" }}
+              onClick={() => navigate("/upcoming-trips")}
+            >
+              View All
+            </Text>
           </CardSection>
           <div className={classes.itemList}>
             {[1, 1, 1, 1, 1].map(() => (
@@ -483,6 +495,61 @@ export default function CustomDiv({ type, item }) {
                 Decline
               </Button>
             </Button.Group>
+          </CardSection>
+        </Card>
+      );
+
+    case 7:
+      return (
+        <Card withBorder className={classes.wrapper}>
+          <CardSection
+            className={classes.Textbox}
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+          >
+            <div>
+              <div className={classes.text}>
+                <Text c="dimmed">Source: </Text>
+                <Text>Lorem Ipsum</Text>
+              </div>
+              <div className={classes.text}>
+                <Text c="dimmed">Destination: </Text>
+                <Text>Lorem</Text>
+              </div>
+              <div className={classes.text}>
+                <Text c="dimmed">Date: </Text>
+                <Text>25 Feb 2023</Text>
+              </div>
+              <div className={classes.text}>
+                <Text c="dimmed">Organiser: </Text>
+                <Text>Shivansh Shukla</Text>
+              </div>
+              <div className={classes.text}>
+                <Text c="dimmed">Members: </Text>
+                <Text>Aarush Sinha</Text>
+              </div>
+              <div className={classes.text}>
+                <Text c="dimmed">Vendor: </Text>
+                <Text>Uber</Text>
+              </div>
+            </div>
+            <div style={{ padding: 0 }}>
+              <ActionIcon
+                variant="transparent"
+                // disabled
+                style={{
+                  height: "100%",
+                  borderLeftColor: "white",
+                }}
+                radius={0}
+                size={30}
+              >
+                <IconEdit style={{ marginLeft: 10 }} />
+              </ActionIcon>
+            </div>
           </CardSection>
         </Card>
       );

@@ -83,7 +83,7 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-function PastTripsPage() {
+function UpcomingTripsPage() {
   const { classes } = useStyles();
   let navigate = useNavigate();
   return (
@@ -92,13 +92,13 @@ function PastTripsPage() {
         Go Back
       </Button>
       <div className={classes.wrapper}>
-        <Text className={classes.pageTitle}>Past Trips</Text>
+        <Text className={classes.pageTitle}>Upcoming Trips</Text>
         {[1, 1, 1, 1, 1, 1, 1, 1].map(() => (
-          <CustomDiv type={4} />
+          <CustomDiv type={7} />
         ))}
       </div>
     </>
   );
 }
 
-export default PastTripsPage;
+export default UpcomingTripsPage;

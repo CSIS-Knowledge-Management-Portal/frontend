@@ -1,28 +1,8 @@
-import {
-  Text,
-  createStyles,
-  TextInput,
-  ActionIcon,
-  Chip,
-  Textarea,
-  Button,
-  Tabs,
-  Avatar,
-} from "@mantine/core";
+import { Text, createStyles, TextInput, Button, Avatar } from "@mantine/core";
 import React from "react";
-import {
-  IconMapPin,
-  IconCalendar,
-  IconPlus,
-  IconMinus,
-  IconClock,
-  IconLock,
-  IconEdit,
-} from "@tabler/icons";
-import { DatePicker, TimeInput } from "@mantine/dates";
-import CustomDiv from "../components/CustomDiv";
-import { useMediaQuery } from "@mantine/hooks";
+import { IconLock, IconEdit } from "@tabler/icons";
 import { useForm } from "@mantine/form";
+import { useNavigate } from "react-router";
 
 const useStyles = createStyles((theme) => ({
   pageTitle: {
@@ -61,6 +41,9 @@ const useStyles = createStyles((theme) => ({
   form: {
     width: "100%",
     marginTop: 20,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
   },
 
   avatar: {
@@ -68,9 +51,6 @@ const useStyles = createStyles((theme) => ({
     height: 216,
     width: 216,
     borderRadius: 999,
-    // borderColor: "white",
-    // borderWidth: 0.2,
-    // borderStyle: "solid",
   },
 
   button: {
@@ -113,9 +93,12 @@ function MyAccountPage() {
     },
   });
 
+  let navigate = useNavigate();
   return (
     <>
-      <Button variant="subtle">Go Back</Button>
+      <Button variant="subtle" onClick={() => navigate(-1)}>
+        Go Back
+      </Button>
       <div className={classes.wrapper}>
         <Text className={classes.pageTitle}>Tell me about myself</Text>
         <Avatar className={classes.avatar} />

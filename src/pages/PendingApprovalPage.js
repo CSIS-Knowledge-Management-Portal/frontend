@@ -1,24 +1,9 @@
-import {
-  Text,
-  createStyles,
-  TextInput,
-  ActionIcon,
-  Chip,
-  Textarea,
-  Button,
-  Tabs,
-} from "@mantine/core";
+import { Text, createStyles, Button, Tabs } from "@mantine/core";
 import React from "react";
-import {
-  IconMapPin,
-  IconCalendar,
-  IconPlus,
-  IconMinus,
-  IconClock,
-} from "@tabler/icons";
-import { DatePicker, TimeInput } from "@mantine/dates";
+
 import CustomDiv from "../components/CustomDiv";
 import { useMediaQuery } from "@mantine/hooks";
+import { useNavigate } from "react-router";
 
 const useStyles = createStyles((theme) => ({
   pageTitle: {
@@ -63,9 +48,12 @@ const useStyles = createStyles((theme) => ({
 function PendingApprovalPage() {
   const { classes } = useStyles();
   const largeScreen = useMediaQuery("(min-width: 900px)");
+  let navigate = useNavigate();
   return (
     <>
-      <Button variant="subtle">Go Back</Button>
+      <Button variant="subtle" onClick={() => navigate(-1)}>
+        Go Back
+      </Button>
       <div className={classes.wrapper}>
         <Text className={classes.pageTitle}>Pending Approval</Text>
         <Tabs

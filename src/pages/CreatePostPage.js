@@ -8,14 +8,9 @@ import {
   Button,
 } from "@mantine/core";
 import React from "react";
-import {
-  IconMapPin,
-  IconCalendar,
-  IconPlus,
-  IconMinus,
-  IconClock,
-} from "@tabler/icons";
+import { IconMapPin, IconCalendar, IconPlus, IconClock } from "@tabler/icons";
 import { DatePicker, TimeInput } from "@mantine/dates";
+import { useNavigate } from "react-router-dom";
 
 const useStyles = createStyles((theme) => ({
   Title: {
@@ -105,9 +100,13 @@ function CreatePostPage() {
     "f20202231@hyderabad.bits-pilani.ac.in",
   ]);
 
+  let navigate = useNavigate();
+
   return (
     <>
-      <Button variant="subtle">Go Back</Button>
+      <Button variant="subtle" onClick={() => navigate(-1)}>
+        Go Back
+      </Button>
       <div className={classes.wrapper}>
         <Text className={classes.pageTitle}>Create New Post</Text>
         <TextInput
@@ -230,6 +229,7 @@ function CreatePostPage() {
           color={"customDark.0"}
           variant="outline"
           className={classes.button}
+          onClick={() => navigate("/choose-vendor")}
         >
           Next
         </Button>

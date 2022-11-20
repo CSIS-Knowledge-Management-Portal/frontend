@@ -1,5 +1,6 @@
 import { Text, createStyles, Grid, Button } from "@mantine/core";
 import React from "react";
+import { Link } from "react-router-dom";
 import CustomDiv from "../components/CustomDiv";
 
 const useStyles = createStyles((theme) => ({
@@ -83,7 +84,9 @@ function Homepage() {
           <div className={classes.sidePanel}>
             <CustomDiv type={2} />
             <CustomDiv type={3} />
-            <Button className={classes.button}>Create New Trip</Button>
+            <Link to="/create-post">
+              <Button className={classes.button}>Create New Trip</Button>
+            </Link>
           </div>
         </Grid.Col>
       </Grid>

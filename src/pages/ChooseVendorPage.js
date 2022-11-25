@@ -1,6 +1,7 @@
-import { Text, createStyles, Button, Card } from "@mantine/core";
+import { Text, createStyles, Button, Card, Collapse } from "@mantine/core";
+import axios from "axios";
 import React from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 const useStyles = createStyles((theme) => ({
   pageTitle: {
@@ -132,26 +133,87 @@ const useStyles = createStyles((theme) => ({
 
 function ChooseVendorPage() {
   const { classes } = useStyles();
-  const [valueFrom, setValueFrom] = React.useState("");
+  const [vendor, setVendor] = React.useState(null);
+  const [vehicle, setVehicle] = React.useState(null);
   let navigate = useNavigate();
+  const { state } = useLocation();
+
+  const Trip = async () => {
+    console.log(state);
+    const data = await axios({
+      method: "post",
+      url: "http://localhost:8000/api/trip/create",
+      headers: { Authorization: localStorage.getItem("SavedToken") },
+      data: {
+        source: state.source,
+        destination: state.destination,
+        departure_date: state.departure_date,
+        departure_time: state.departure_time,
+        waiting_time: state.waiting_time,
+        details: state.details,
+        passengers: state.passengers,
+        vendor: vendor,
+        seats: vehicle,
+      },
+    });
+
+    console.log(data.data);
+
+    navigate("/posts");
+  };
+
   return (
     <>
       <div className={classes.wrapper}>
         <Text className={classes.pageTitle}>Create New Post</Text>
         <Text className={classes.pageSubtitle}>Choose Vendor</Text>
         <div className={classes.vendorGroup}>
-          <Card className={classes.box} withBorder />
-          <Card className={classes.box} withBorder />
-          <Card className={classes.box} withBorder />
+          <Card
+            className={classes.box}
+            withBorder
+            onClick={() => setVendor("Uber")}
+          />
+          <Card
+            className={classes.box}
+            withBorder
+            onClick={() => setVendor("Ola")}
+          />
+          <Card
+            className={classes.box}
+            withBorder
+            onClick={() => setVendor("Private")}
+          />
         </div>
-        <Text className={classes.pageSubtitle}>Choose Vehicle</Text>
-        <div className={classes.vendorGroup}>
-          <Card className={classes.box} withBorder />
-          <Card className={classes.box} withBorder />
-          <Card className={classes.box} withBorder />
-          <Card className={classes.box} withBorder />
-          <Card className={classes.box} withBorder />
-        </div>
+        <Collapse in={vendor ? true : false}>
+          <Text className={classes.pageSubtitle}>Choose Vehicle</Text>
+          <div className={classes.vendorGroup}>
+            <Card
+              className={classes.box}
+              withBorder
+              onClick={() => setVehicle(3)}
+            />
+            <Card
+              className={classes.box}
+              withBorder
+              onClick={() => setVehicle(4)}
+            />
+            <Card
+              className={classes.box}
+              withBorder
+              onClick={() => setVehicle(5)}
+            />
+            <Card
+              className={classes.box}
+              withBorder
+              onClick={() => setVehicle(6)}
+            />
+            <Card
+              className={classes.box}
+              withBorder
+              onClick={() => setVehicle(7)}
+            />
+          </div>
+        </Collapse>
         <Button
           color={"customDark.0"}
           variant="outline"
@@ -160,7 +222,11 @@ function ChooseVendorPage() {
         >
           Previous
         </Button>
-        <Button className={classes.confirmButton} onClick={() => navigate("/")}>
+        <Button
+          disabled={vendor ? false : true}
+          className={classes.confirmButton}
+          onClick={() => Trip()}
+        >
           Confirm Trip
         </Button>
       </div>

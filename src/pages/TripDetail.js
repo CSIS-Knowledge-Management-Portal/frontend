@@ -1,27 +1,23 @@
-import { Text, createStyles, Button } from "@mantine/core";
+import {
+  Text,
+  createStyles,
+  Grid,
+  Button,
+  Card,
+  CardSection,
+  Title,
+} from "@mantine/core";
 import axios from "axios";
+import dayjs from "dayjs";
 import React from "react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import CustomDiv from "../components/CustomDiv";
 
 const useStyles = createStyles((theme) => ({
-  Title: {
-    fontSize: 36,
-
-    [`@media (max-width: ${theme.breakpoints.xl}px)`]: {
-      fontSize: 36 * 0.85,
-    },
-    [`@media (max-width: ${theme.breakpoints.lg}px)`]: {
-      fontSize: 36 * 0.7,
-    },
-    [`@media (max-width: ${theme.breakpoints.md}px)`]: {
-      fontSize: 20,
-    },
-  },
-
   pageTitle: {
     fontSize: 28,
-
+    textAlign: "center",
+    marginBottom: 20,
     [`@media (max-width: ${theme.breakpoints.xl}px)`]: {
       fontSize: 28 * 0.85,
     },
@@ -34,11 +30,9 @@ const useStyles = createStyles((theme) => ({
   },
 
   wrapper: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
     marginLeft: "auto",
     marginRight: "auto",
+    padding: 20,
     width: "50%",
     [`@media (max-width: ${theme.breakpoints.xl}px)`]: {
       width: "60%",
@@ -63,6 +57,22 @@ const useStyles = createStyles((theme) => ({
     "&:hover": {
       opacity: 1,
     },
+
+    [`@media (max-width: ${theme.breakpoints.xl}px)`]: {
+      height: 70,
+    },
+    [`@media (max-width: ${theme.breakpoints.lg}px)`]: {
+      height: 60,
+    },
+    [`@media (max-width: ${theme.breakpoints.md}px)`]: {
+      height: 50,
+    },
+  },
+
+  text: {
+    display: "flex",
+    flexDirection: "row",
+    gap: 4,
   },
 
   sidePanel: {
@@ -84,35 +94,30 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-function PastTripsPage() {
+function TripDetail() {
   const { classes } = useStyles();
-  const [pastPosts, setPastPosts] = React.useState(null);
-
   let navigate = useNavigate();
+  const [post, setPost] = React.useState(null);
+  const { id } = useParams();
 
   React.useEffect(() => {
-    const Posts = async () => {
-      const data = await axios.get("http://localhost:8000/api/trip/past", {
+    const Post = async () => {
+      const data = await axios.get(`http://localhost:8000/api/trip/${id}`, {
         headers: { Authorization: localStorage.getItem("SavedToken") },
       });
-      setPastPosts(data.data);
+      setPost(data.data);
     };
-    Posts();
+    Post();
   }, []);
-  console.log(pastPosts);
-  return (
-    <>
-      <Button variant="subtle" onClick={() => navigate(-1)}>
-        Go Back
-      </Button>
-      <div className={classes.wrapper}>
-        <Text className={classes.pageTitle}>Past Trips</Text>
-        {pastPosts?.map((item, id) => (
-          <CustomDiv type={4} key={id} item={item} />
-        ))}
-      </div>
-    </>
-  );
+  if (post) {
+    navigate("/create-post", {
+      state: {
+        flag: true,
+        data: post,
+      },
+    });
+  }
+  return;
 }
 
-export default PastTripsPage;
+export default TripDetail;

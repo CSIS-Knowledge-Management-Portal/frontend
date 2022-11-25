@@ -1,20 +1,53 @@
-import { Text, createStyles, Grid, Button } from "@mantine/core";
+import {
+  Text,
+  createStyles,
+  Grid,
+  Button,
+  Paper,
+  TextInput,
+  ActionIcon,
+  Chip,
+  Divider,
+  Modal,
+} from "@mantine/core";
+import { DatePicker } from "@mantine/dates";
+import { IconCalendar, IconX } from "@tabler/icons";
+import axios from "axios";
+import dayjs from "dayjs";
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import CustomDiv from "../components/CustomDiv";
 
 const useStyles = createStyles((theme) => ({
-  Title: {
-    fontSize: 36,
-
+  pageTitle: {
+    fontSize: 28,
+    textAlign: "center",
     [`@media (max-width: ${theme.breakpoints.xl}px)`]: {
-      fontSize: 36 * 0.85,
+      fontSize: 28 * 0.85,
     },
     [`@media (max-width: ${theme.breakpoints.lg}px)`]: {
-      fontSize: 36 * 0.7,
+      fontSize: 28 * 0.7,
     },
     [`@media (max-width: ${theme.breakpoints.md}px)`]: {
-      fontSize: 20,
+      fontSize: 16,
+    },
+  },
+
+  wrapper: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginLeft: "auto",
+    marginRight: "auto",
+    width: "80%",
+    [`@media (max-width: ${theme.breakpoints.xl}px)`]: {
+      width: "60%",
+    },
+    [`@media (max-width: ${theme.breakpoints.lg}px)`]: {
+      width: "70%",
+    },
+    [`@media (max-width: ${theme.breakpoints.md}px)`]: {
+      width: "85%",
     },
   },
 
@@ -44,52 +77,297 @@ const useStyles = createStyles((theme) => ({
 
   sidePanel: {
     position: "sticky",
-    top: 64,
+    top: 80,
     display: "flex",
     flexDirection: "column",
-    height: window.innerHeight * 0.8,
-
+    marginTop: 20,
     [`@media (max-width: ${theme.breakpoints.xl}px)`]: {
-      top: 64 * 0.85,
+      marginTop: 20 * 0.85,
+      top: 80 * 0.85,
     },
     [`@media (max-width: ${theme.breakpoints.lg}px)`]: {
-      top: 64 * 0.7,
+      marginTop: 20 * 0.7,
+      top: 80 * 0.7,
     },
     [`@media (max-width: ${theme.breakpoints.md}px)`]: {
       display: "none",
+    },
+    [`@media (max-width: ${theme.breakpoints.sm}px)`]: {
+      display: "none",
+    },
+    [`@media (max-width: ${theme.breakpoints.xs}px)`]: {
+      display: "none",
+    },
+  },
+
+  Textbox: {
+    padding: 10,
+    fontSize: 16,
+
+    [`@media (max-width: ${theme.breakpoints.xl}px)`]: {
+      fontSize: 16 * 0.85,
+    },
+    [`@media (max-width: ${theme.breakpoints.lg}px)`]: {
+      fontSize: 16 * 0.7,
+    },
+    [`@media (max-width: ${theme.breakpoints.md}px)`]: {
+      fontSize: 12,
+    },
+    [`@media (max-width: ${theme.breakpoints.sm}px)`]: {
+      fontSize: 12,
+    },
+  },
+  form: {
+    width: "100%",
+    marginTop: 20,
+  },
+
+  chip: {
+    marginTop: 10,
+  },
+
+  mobileFilter: {
+    display: "none",
+    [`@media (max-width: ${theme.breakpoints.md}px)`]: {
+      display: "block",
     },
   },
 }));
 
 function Homepage() {
   const { classes } = useStyles();
+  let navigate = useNavigate();
+  const [posts, setPosts] = React.useState(null);
+  const [email, setEmail] = React.useState();
+  const [dest, setDest] = React.useState("");
+  const [src, setSrc] = React.useState("");
+  const [dt, setDt] = React.useState("");
+  const [opened, setOpened] = React.useState(false);
+
+  React.useEffect(() => {
+    const Posts = async () => {
+      const data = await axios.get(
+        "http://localhost:8000/api/trip/all-active",
+        {
+          headers: { Authorization: localStorage.getItem("SavedToken") },
+        }
+      );
+      setPosts(data.data);
+    };
+    Posts();
+
+    const User = async () => {
+      const data = await axios.get("http://localhost:8000/user/", {
+        headers: { Authorization: localStorage.getItem("SavedToken") },
+      });
+      setEmail(data.data.email);
+    };
+    User();
+  }, [setPosts]);
+
+  const Filter = async () => {
+    setOpened(false);
+    const data = await axios({
+      method: "get",
+      url: `http://localhost:8000/api/trip/all-active?${
+        dest.length > 0 ? "dest=" + dest + "&" : ""
+      }${src.length > 0 ? "src=" + src + "&" : ""}${
+        dt.length > 0 ? "dt=" + dt : ""
+      }`,
+      headers: { Authorization: localStorage.getItem("SavedToken") },
+    });
+    setPosts(data.data);
+  };
+
   return (
     <>
-      <div style={{ display: "inline-block" }}>
-        <Text
-          className={classes.Title}
-          variant="gradient"
-          gradient={{ from: "blue.5", to: "pink.7", deg: 0 }}
+      <Button variant="outline" onClick={() => navigate(-1)}>
+        Go Back
+      </Button>
+      <Text className={classes.pageTitle}>All Posts</Text>
+      <Grid className={classes.wrapper} gutter={20}>
+        {/* <Grid.Col lg={1} /> */}
+        <Grid.Col lg={4}>
+          <Paper
+            shadow={"md"}
+            p="lg"
+            style={{ width: "100%" }}
+            className={classes.sidePanel}
+          >
+            <div className={classes.Textbox}>
+              <Text c="dimmed">Source</Text>
+              <TextInput
+                onChange={(event) => setDest(event.currentTarget.value)}
+                value={src}
+                rightSection={
+                  <ActionIcon
+                    disabled={src ? false : true}
+                    onClick={() => setSrc("")}
+                  >
+                    <IconX />
+                  </ActionIcon>
+                }
+              />
+              <Chip.Group
+                className={classes.chip}
+                value={src}
+                onChange={setSrc}
+              >
+                <Chip value="Campus">Campus</Chip>
+                <Chip value="Airport">Airport</Chip>
+                <Chip value="F3">F3</Chip>
+                <Chip value="BnB">BnB</Chip>
+                <Chip value="Railway Stn">Rlw Stn</Chip>
+              </Chip.Group>
+            </div>
+            <div className={classes.Textbox}>
+              <Text c="dimmed">Destination</Text>
+              <TextInput
+                onChange={(event) => setDest(event.currentTarget.value)}
+                value={dest}
+                rightSection={
+                  <ActionIcon
+                    disabled={dest ? false : true}
+                    onClick={() => setDest("")}
+                  >
+                    <IconX />
+                  </ActionIcon>
+                }
+              />
+              <Chip.Group
+                className={classes.chip}
+                value={dest}
+                onChange={setDest}
+              >
+                <Chip value="Campus">Campus</Chip>
+                <Chip value="Airport">Airport</Chip>
+                <Chip value="F3">F3</Chip>
+                <Chip value="BnB">BnB</Chip>
+                <Chip value="Railway Stn">Rlw Stn</Chip>
+              </Chip.Group>
+            </div>
+            <div className={classes.Textbox}>
+              <Text c="dimmed">Date</Text>
+              <DatePicker
+                placeholder="Select from Calendar"
+                minDate={dayjs(new Date()).toDate()}
+                maxDate={null}
+                defaultValue={dt}
+                inputFormat="YYYY-MM-DD"
+                onChange={(value) => setDt(dayjs(value).format("YYYY-MM-DD"))}
+                rightSection={<IconCalendar size={20} />}
+              />
+            </div>
+            <Divider />
+            <div
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                marginTop: 10,
+              }}
+            >
+              <Button variant="outline" onClick={() => Filter()}>
+                Apply Filters
+              </Button>
+            </div>
+          </Paper>
+          <Button
+            variant="subtle"
+            className={classes.mobileFilter}
+            onClick={() => setOpened(true)}
+          >
+            Apply Filters
+          </Button>
+        </Grid.Col>
+        <Grid.Col
+          lg={7}
+          style={{ display: "flex", flexDirection: "column", width: "100%" }}
         >
-          Hi, Shivansh!
-        </Text>
-      </div>
-      <Grid>
-        <Grid.Col xs={12} md={7}>
-          {[1, 1, 1, 1, 1, 1, 1].map((item, id) => (
-            <CustomDiv key={id} type={1} />
-          ))}
+          {posts?.map((item, id) =>
+            item.creator.email === email ? null : (
+              <CustomDiv key={id} type={1} item={item} />
+            )
+          )}
         </Grid.Col>
-        <Grid.Col md={5}>
-          <div className={classes.sidePanel}>
-            <CustomDiv type={2} />
-            <CustomDiv type={3} />
-            <Link to="/create-post">
-              <Button className={classes.button}>Create New Trip</Button>
-            </Link>
-          </div>
-        </Grid.Col>
+        <Grid.Col lg={1} />
       </Grid>
+
+      <Modal
+        opened={opened}
+        onClose={() => setOpened(false)}
+        title="Select Filters"
+      >
+        <div className={classes.Textbox}>
+          <Text c="dimmed">Source</Text>
+          <TextInput
+            onChange={(event) => setDest(event.currentTarget.value)}
+            value={src}
+            rightSection={
+              <ActionIcon
+                disabled={src ? false : true}
+                onClick={() => setSrc("")}
+              >
+                <IconX />
+              </ActionIcon>
+            }
+          />
+          <Chip.Group className={classes.chip} value={src} onChange={setSrc}>
+            <Chip value="Campus">Campus</Chip>
+            <Chip value="Airport">Airport</Chip>
+            <Chip value="F3">F3</Chip>
+            <Chip value="BnB">BnB</Chip>
+            <Chip value="Railway Stn">Rlw Stn</Chip>
+          </Chip.Group>
+        </div>
+        <div className={classes.Textbox}>
+          <Text c="dimmed">Destination</Text>
+          <TextInput
+            onChange={(event) => setDest(event.currentTarget.value)}
+            value={dest}
+            rightSection={
+              <ActionIcon
+                disabled={dest ? false : true}
+                onClick={() => setDest("")}
+              >
+                <IconX />
+              </ActionIcon>
+            }
+          />
+          <Chip.Group className={classes.chip} value={dest} onChange={setDest}>
+            <Chip value="Campus">Campus</Chip>
+            <Chip value="Airport">Airport</Chip>
+            <Chip value="F3">F3</Chip>
+            <Chip value="BnB">BnB</Chip>
+            <Chip value="Railway Stn">Rlw Stn</Chip>
+          </Chip.Group>
+        </div>
+        <div className={classes.Textbox}>
+          <Text c="dimmed">Date</Text>
+          <DatePicker
+            placeholder="Select from Calendar"
+            minDate={dayjs(new Date()).toDate()}
+            maxDate={null}
+            defaultValue={dt}
+            inputFormat="YYYY-MM-DD"
+            onChange={(value) => setDt(dayjs(value).format("YYYY-MM-DD"))}
+            rightSection={<IconCalendar size={20} />}
+          />
+        </div>
+        <Divider />
+        <div
+          style={{
+            width: "100%",
+            display: "flex",
+            justifyContent: "center",
+            marginTop: 10,
+          }}
+        >
+          <Button variant="outline" onClick={() => Filter()}>
+            Apply Filters
+          </Button>
+        </div>
+      </Modal>
     </>
   );
 }

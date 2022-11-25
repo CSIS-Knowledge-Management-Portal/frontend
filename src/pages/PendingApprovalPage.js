@@ -1,9 +1,9 @@
 import { Text, createStyles, Button, Tabs } from "@mantine/core";
 import React from "react";
-
 import CustomDiv from "../components/CustomDiv";
 import { useMediaQuery } from "@mantine/hooks";
 import { useNavigate } from "react-router";
+import axios from "axios";
 
 const useStyles = createStyles((theme) => ({
   pageTitle: {
@@ -49,6 +49,36 @@ function PendingApprovalPage() {
   const { classes } = useStyles();
   const largeScreen = useMediaQuery("(min-width: 900px)");
   let navigate = useNavigate();
+
+  const [sent, setSent] = React.useState();
+  const [received, setReceived] = React.useState();
+
+  React.useEffect(() => {
+    const Sent = async () => {
+      const data = await axios.get(
+        "http://localhost:8000/api/request/all-sent",
+        {
+          headers: { Authorization: localStorage.getItem("SavedToken") },
+        }
+      );
+      setSent(data.data);
+    };
+    Sent();
+
+    const Received = async () => {
+      const data = await axios.get(
+        "http://localhost:8000/api/request/all-received",
+        {
+          headers: { Authorization: localStorage.getItem("SavedToken") },
+        }
+      );
+      setReceived(data.data);
+    };
+    Received();
+  }, []);
+
+  console.log(sent);
+
   return (
     <>
       <Button variant="subtle" onClick={() => navigate(-1)}>
@@ -69,14 +99,14 @@ function PendingApprovalPage() {
           </Tabs.List>
 
           <Tabs.Panel value="sent" pl="xl">
-            {[1, 1, 1, 1, 1, 1, 1].map(() => (
-              <CustomDiv type={5} />
+            {sent?.map((item, id) => (
+              <CustomDiv key={id} type={5} item={item} />
             ))}
           </Tabs.Panel>
 
           <Tabs.Panel value="recieved" pl="xl">
-            {[1, 1, 1, 1, 1, 1, 1].map(() => (
-              <CustomDiv type={6} />
+            {received?.map((item, id) => (
+              <CustomDiv type={6} key={id} item={item} />
             ))}
           </Tabs.Panel>
         </Tabs>

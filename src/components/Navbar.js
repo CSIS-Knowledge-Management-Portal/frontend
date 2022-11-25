@@ -1,7 +1,9 @@
-import { Avatar, createStyles, Menu, Text } from "@mantine/core";
+import { Avatar, Button, createStyles, Menu, Text } from "@mantine/core";
 import React from "react";
 import { IconChevronDown, IconLogout } from "@tabler/icons";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { GoogleLogin } from "react-google-login";
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -66,9 +68,31 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-function Navbar() {
+function Navbar({ loggedIn, setLoggedIn }) {
   const { classes } = useStyles();
+
+  const Login = async (response) => {
+    console.log(response.tokenId);
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "http://localhost:8000/user/auth");
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.send("credential=" + response.tokenId);
+    xhr.onload = function () {
+      let data = JSON.parse(xhr.responseText);
+      console.log("Signed in as: ", data.token);
+      localStorage.setItem("SavedToken", "Bearer " + data.token);
+      setLoggedIn(true);
+    };
+  };
+
+  const Logout = () => {
+    localStorage.removeItem("SavedToken");
+    setLoggedIn(false);
+  };
+
   let navigate = useNavigate();
+
+  React.useEffect(() => {}, [loggedIn]);
 
   return (
     <div className={classes.wrapper}>
@@ -76,36 +100,60 @@ function Navbar() {
         TRAVEL@BPHC
       </Text>
 
-      <Menu shadow="md" width={200} position="top-end">
-        <Menu.Target className={classes.avatarContainer}>
-          <div>
-            <Avatar variant="filled" className={classes.avatar} />
-            <IconChevronDown size={14} />
-          </div>
-        </Menu.Target>
+      {loggedIn ? (
+        <Menu shadow="md" width={200} position="top-end">
+          <Menu.Target className={classes.avatarContainer}>
+            <div>
+              <Avatar variant="filled" className={classes.avatar} />
+              <IconChevronDown size={14} />
+            </div>
+          </Menu.Target>
 
-        <Menu.Dropdown>
-          <Menu.Label>Application</Menu.Label>
-          <Link to="/my-account">
-            <Menu.Item>My Account</Menu.Item>
-          </Link>
-          <Link to="/upcoming-trips">
-            <Menu.Item>Upcoming Trips</Menu.Item>
-          </Link>
-          <Link to="/past-trips">
-            <Menu.Item>Past Trips</Menu.Item>
-          </Link>
-          <Link to="/pending-approval">
-            <Menu.Item>Pending Approvals</Menu.Item>
-          </Link>
+          <Menu.Dropdown>
+            <Menu.Label>Application</Menu.Label>
+            <Link to="/posts">
+              <Menu.Item>All Posts</Menu.Item>
+            </Link>
+            <Link to="/upcoming-trips">
+              <Menu.Item>Upcoming Trips</Menu.Item>
+            </Link>
+            <Link to="/past-trips">
+              <Menu.Item>Past Trips</Menu.Item>
+            </Link>
+            <Link to="/pending-approval">
+              <Menu.Item>Pending Approvals</Menu.Item>
+            </Link>
 
-          <Menu.Divider />
+            <Menu.Divider />
 
-          <Menu.Item icon={<IconLogout size={14} />}>Logout</Menu.Item>
-        </Menu.Dropdown>
-      </Menu>
+            <Menu.Item icon={<IconLogout size={14} />} onClick={Logout}>
+              Logout
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
+      ) : (
+        <GoogleLogin
+          clientId="980575440299-7v5ap704i43iao1v61atqs3872f1mifr.apps.googleusercontent.com"
+          theme="dark"
+          render={(renderProps) => (
+            <Button
+              color={"customDark.0"}
+              variant="outline"
+              onClick={renderProps.onClick}
+            >
+              Login
+            </Button>
+          )}
+          buttonText="Login"
+          onSuccess={Login}
+          onFailure={Login}
+        />
+      )}
     </div>
   );
 }
 
 export default Navbar;
+{
+  /*  */
+}

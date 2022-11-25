@@ -10,6 +10,8 @@ import {
 } from "@mantine/core";
 import { IconCheck, IconEdit, IconX } from "@tabler/icons";
 import { useNavigate } from "react-router";
+import dayjs from "dayjs";
+import axios from "axios";
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -186,10 +188,79 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export default function CustomDiv({ type, item }) {
+export default function CustomDiv({ type, item, email }) {
   const { classes } = useStyles();
   const [showDetails, setShowDetails] = React.useState(false);
+  const [pastPosts, setPastPosts] = React.useState(null);
+  const [sent, setSent] = React.useState();
+  const [received, setReceived] = React.useState();
+  const [upcomingPosts, setUpcomingPosts] = React.useState(null);
+  const [user, setUser] = React.useState();
   let navigate = useNavigate();
+
+  const SendRequest = async (item) => {
+    const data = await axios({
+      method: "post",
+      url: `http://localhost:8000/api/request/new`,
+      headers: { Authorization: localStorage.getItem("SavedToken") },
+      data: {
+        trip_link: `http://localhost:3000/post/${item.id}`,
+        trip_id: item.id,
+        requestor: user?.email,
+        creator: item.creator?.email,
+      },
+    });
+    console.log(data.data);
+  };
+  React.useEffect(() => {
+    const User = async () => {
+      const data = await axios.get("http://localhost:8000/user/", {
+        headers: { Authorization: localStorage.getItem("SavedToken") },
+      });
+      setUser(data.data);
+    };
+    User();
+
+    const UpcomingTrips = async () => {
+      const data = await axios.get("http://localhost:8000/api/trip/upcoming", {
+        headers: { Authorization: localStorage.getItem("SavedToken") },
+      });
+      setUpcomingPosts(data.data.slice(0, 2));
+    };
+    UpcomingTrips();
+
+    const PastTrips = async () => {
+      const data = await axios.get("http://localhost:8000/api/trip/past", {
+        headers: { Authorization: localStorage.getItem("SavedToken") },
+      });
+      setPastPosts(data.data.slice(0, 2));
+    };
+    PastTrips();
+
+    const ApprovalRecieved = async () => {
+      const data = await axios.get(
+        "http://localhost:8000/api/request/all-received",
+        {
+          headers: { Authorization: localStorage.getItem("SavedToken") },
+        }
+      );
+      setReceived(data.data.slice(0, 2));
+    };
+    ApprovalRecieved();
+
+    const ApprovalSent = async () => {
+      const data = await axios.get(
+        "http://localhost:8000/api/request/all-sent",
+        {
+          headers: { Authorization: localStorage.getItem("SavedToken") },
+        }
+      );
+      setSent(data.data.slice(0, 2));
+    };
+    ApprovalSent();
+  }, []);
+
+  console.log(sent);
 
   switch (type) {
     case 1:
@@ -198,36 +269,28 @@ export default function CustomDiv({ type, item }) {
           <CardSection className={classes.Textbox}>
             <div className={classes.text}>
               <Text c="dimmed">To: </Text>
-              <Text>Lorem Ipsum</Text>
+              <Text>{item.source}</Text>
             </div>
             <div className={classes.text}>
               <Text c="dimmed">From: </Text>
-              <Text>Lorem</Text>
+              <Text>{item.destination}</Text>
             </div>
             <div className={classes.text}>
               <Text c="dimmed">Date: </Text>
-              <Text>25 Feb 2023</Text>
+              <Text>{dayjs(item.departure_date).format("MMMM D, YYYY")}</Text>
             </div>
             <div className={classes.text}>
               <Text c="dimmed">Space Available: </Text>
-              <Text>2</Text>
+              <Text>{item.seats - item.passengers.length}</Text>
             </div>
             <div className={classes.text}>
               <Text c="dimmed">Waiting time: </Text>
-              <Text>1 hr</Text>
+              <Text>{item.waiting_time}</Text>
             </div>
             <Collapse in={showDetails}>
               <div className={classes.text}>
                 <Text c="dimmed">Details: </Text>
-                <Text>
-                  Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-                  accusantium doloremque laudantium, totam rem aperiam, eaque
-                  ipsa quae ab illo inventore veritatis et quasi architecto
-                  beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem
-                  quia voluptas sit aspernatur aut odit aut fugit, sed quia
-                  consequuntur magni dolores eos qui ratione voluptatem sequi
-                  nesciunt.
-                </Text>
+                <Text>{item.details}</Text>
               </div>
             </Collapse>
           </CardSection>
@@ -240,11 +303,12 @@ export default function CustomDiv({ type, item }) {
                 classNames={{ root: classes.button, label: classes.label }}
                 onClick={() => setShowDetails(!showDetails)}
               >
-                Show Details
+                {showDetails ? "Hide Details" : "Show Details"}
               </Button>
               <Button
                 classNames={{ root: classes.button, label: classes.label }}
                 style={{ borderLeftStyle: "solid" }}
+                onClick={() => SendRequest(item)}
               >
                 Send Request
               </Button>
@@ -266,8 +330,9 @@ export default function CustomDiv({ type, item }) {
             </Text>
           </CardSection>
           <div className={classes.itemList}>
-            {[1, 1, 1, 1, 1].map(() => (
+            {received?.map((item, id) => (
               <CardSection
+                key={id}
                 withBorder
                 className={classes.Textbox}
                 style={{
@@ -280,11 +345,15 @@ export default function CustomDiv({ type, item }) {
                 <div>
                   <div className={classes.text}>
                     <Text c="dimmed">From: </Text>
-                    <Text>Lorem Ipsum</Text>
+                    <Text>{item.source}</Text>
                   </div>
                   <div className={classes.text}>
-                    <Text c="dimmed">For: </Text>
-                    <Text>Lorem</Text>
+                    <Text c="dimmed">To: </Text>
+                    <Text>{item.destination}</Text>
+                  </div>
+                  <div className={classes.text}>
+                    <Text c="dimmed">Date: </Text>
+                    <Text>{item.departure_date}</Text>
                   </div>
                 </div>
                 <div
@@ -340,8 +409,9 @@ export default function CustomDiv({ type, item }) {
             </Text>
           </CardSection>
           <div className={classes.itemList}>
-            {[1, 1, 1, 1, 1].map(() => (
+            {upcomingPosts?.map((item, id) => (
               <CardSection
+                key={id}
                 withBorder
                 className={classes.Textbox}
                 style={{
@@ -354,21 +424,27 @@ export default function CustomDiv({ type, item }) {
                 <div>
                   <div className={classes.text}>
                     <Text c="dimmed">From: </Text>
-                    <Text>Lorem Ipsum</Text>
+                    <Text>{item.source}</Text>
                   </div>
                   <div className={classes.text}>
-                    <Text c="dimmed">For: </Text>
-                    <Text>Lorem</Text>
+                    <Text c="dimmed">To: </Text>
+                    <Text>{item.destination}</Text>
+                  </div>
+                  <div className={classes.text}>
+                    <Text c="dimmed">Date: </Text>
+                    <Text>{item.departure_date}</Text>
                   </div>
                 </div>
                 <Button
                   leftIcon={<IconCheck />}
                   variant="outline"
                   color="blue"
+                  style={{ marginRight: 0 }}
                   classNames={{ root: classes.roundedButton }}
                   styles={(theme) => ({
                     root: {
                       transitionDuration: "0.2s",
+                      padding: 8,
                       "&:hover": {
                         color: theme.fn.lighten("#0059C5", 0.1),
                         borderColor: theme.fn.lighten("#0059C5", 0.1),
@@ -390,23 +466,28 @@ export default function CustomDiv({ type, item }) {
           <CardSection className={classes.Textbox}>
             <div className={classes.text}>
               <Text c="dimmed">To: </Text>
-              <Text>Lorem Ipsum</Text>
+              <Text>{item.destination}</Text>
             </div>
             <div className={classes.text}>
               <Text c="dimmed">From: </Text>
-              <Text>Lorem</Text>
+              <Text>{item.source}</Text>
             </div>
             <div className={classes.text}>
               <Text c="dimmed">Date: </Text>
-              <Text>25 Feb 2023</Text>
+              <Text>{dayjs(item.departure_date).format("MMMM D, YYYY")}</Text>
             </div>
             <div className={classes.text}>
-              <Text c="dimmed">Space Available: </Text>
-              <Text>2</Text>
-            </div>
-            <div className={classes.text}>
-              <Text c="dimmed">Waiting time: </Text>
-              <Text>1 hr</Text>
+              <Text c="dimmed">Members: </Text>
+              <div>
+                {item.passengers.map((passenger, id) => (
+                  <Text key={id}>
+                    {passenger.name}
+                    {" <"}
+                    {passenger.email}
+                    {">"}{" "}
+                  </Text>
+                ))}
+              </div>
             </div>
           </CardSection>
         </Card>
@@ -418,15 +499,24 @@ export default function CustomDiv({ type, item }) {
           <CardSection className={classes.Textbox}>
             <div className={classes.text}>
               <Text c="dimmed">To: </Text>
-              <Text>Lorem Ipsum</Text>
+              <Text>{item.destination}</Text>
             </div>
             <div className={classes.text}>
               <Text c="dimmed">From: </Text>
-              <Text>Lorem</Text>
+              <Text>{item.source}</Text>
             </div>
             <div className={classes.text}>
               <Text c="dimmed">Date: </Text>
-              <Text>25 Feb 2023</Text>
+              <Text>{dayjs(item.departure_date).format("MMMM D, YYYY")}</Text>
+            </div>
+            <div className={classes.text}>
+              <Text c="dimmed">Reciever: </Text>
+              <Text>
+                {item.receiver.name}
+                {" <"}
+                {item.receiver.email}
+                {">"}{" "}
+              </Text>
             </div>
           </CardSection>
           <CardSection>
@@ -436,15 +526,23 @@ export default function CustomDiv({ type, item }) {
             >
               <Button
                 classNames={{ root: classes.button, label: classes.label }}
+                style={{
+                  background:
+                    item.status === "Unconfirmed"
+                      ? null
+                      : item.status === "Accepted"
+                      ? "green"
+                      : "red",
+                }}
               >
-                Approval Awaited
+                {item.status}
               </Button>
-              <Button
+              {/* <Button
                 classNames={{ root: classes.button, label: classes.label }}
                 style={{ borderLeftStyle: "solid" }}
               >
                 Go to Post
-              </Button>
+              </Button> */}
             </Button.Group>
           </CardSection>
         </Card>
@@ -513,44 +611,189 @@ export default function CustomDiv({ type, item }) {
             <div>
               <div className={classes.text}>
                 <Text c="dimmed">Source: </Text>
-                <Text>Lorem Ipsum</Text>
+                <Text>{item.source}</Text>
               </div>
               <div className={classes.text}>
                 <Text c="dimmed">Destination: </Text>
-                <Text>Lorem</Text>
+                <Text>{item.destination}</Text>
               </div>
               <div className={classes.text}>
                 <Text c="dimmed">Date: </Text>
-                <Text>25 Feb 2023</Text>
+                <Text>{dayjs(item.departure_date).format("MMMM D, YYYY")}</Text>
+              </div>
+              <div className={classes.text}>
+                <Text c="dimmed">Departure Time: </Text>
+                <Text>{item.departure_time}</Text>
               </div>
               <div className={classes.text}>
                 <Text c="dimmed">Organiser: </Text>
-                <Text>Shivansh Shukla</Text>
+                <Text>
+                  {item.creator.name}
+                  {" <"}
+                  {item.creator.email}
+                  {">"}{" "}
+                </Text>
               </div>
               <div className={classes.text}>
                 <Text c="dimmed">Members: </Text>
-                <Text>Aarush Sinha</Text>
-              </div>
-              <div className={classes.text}>
-                <Text c="dimmed">Vendor: </Text>
-                <Text>Uber</Text>
+                <div>
+                  {item.passengers.map((passenger, id) => (
+                    <Text key={id}>
+                      {passenger.name}
+                      {" <"}
+                      {passenger.email}
+                      {">"}{" "}
+                    </Text>
+                  ))}
+                </div>
               </div>
             </div>
             <div style={{ padding: 0 }}>
               <ActionIcon
                 variant="transparent"
-                // disabled
+                disabled={email === item.creator.email ? false : true}
                 style={{
                   height: "100%",
                   borderLeftColor: "white",
                 }}
                 radius={0}
                 size={30}
+                onClick={() =>
+                  navigate("/create-post", {
+                    state: {
+                      flag: true,
+                      data: item,
+                    },
+                  })
+                }
               >
                 <IconEdit style={{ marginLeft: 10 }} />
               </ActionIcon>
             </div>
           </CardSection>
+        </Card>
+      );
+
+    case 8:
+      return (
+        <Card withBorder className={classes.wrapper}>
+          <CardSection className={classes.titleBox}>
+            <Text>Past Trips</Text>
+            <Text
+              style={{ cursor: "pointer" }}
+              onClick={() => navigate("/past-trips")}
+            >
+              View All
+            </Text>
+          </CardSection>
+          <div className={classes.itemList}>
+            {pastPosts?.map((item, id) => (
+              <CardSection
+                key={id}
+                withBorder
+                className={classes.Textbox}
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <div>
+                  <div className={classes.text}>
+                    <Text c="dimmed">From: </Text>
+                    <Text>{item.source}</Text>
+                  </div>
+                  <div className={classes.text}>
+                    <Text c="dimmed">To: </Text>
+                    <Text>{item.destination}</Text>
+                  </div>
+                  <div className={classes.text}>
+                    <Text c="dimmed">Date: </Text>
+                    <Text>{item.departure_date}</Text>
+                  </div>
+                </div>
+              </CardSection>
+            ))}
+          </div>
+        </Card>
+      );
+
+    case 9:
+      return (
+        <Card withBorder className={classes.wrapper}>
+          <CardSection className={classes.titleBox}>
+            <Text>Request Sent</Text>
+            <Text
+              style={{ cursor: "pointer" }}
+              onClick={() => navigate("/pending-approval")}
+            >
+              View All
+            </Text>
+          </CardSection>
+          <div className={classes.itemList}>
+            {sent?.map((item, id) => (
+              <CardSection
+                key={id}
+                withBorder
+                className={classes.Textbox}
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <div>
+                  <div className={classes.text}>
+                    <Text c="dimmed">From: </Text>
+                    <Text>{item.source}</Text>
+                  </div>
+                  <div className={classes.text}>
+                    <Text c="dimmed">To: </Text>
+                    <Text>{item.destination}</Text>
+                  </div>
+                  <div className={classes.text}>
+                    <Text c="dimmed">Date: </Text>
+                    <Text>{item.departure_date}</Text>
+                  </div>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
+                  <Button
+                    variant="outline"
+                    style={{
+                      marginRight: 0,
+                      cursor: "initial",
+                      color: "white",
+                      background:
+                        item.status === "Unconfirmed"
+                          ? null
+                          : item.status === "Accepted"
+                          ? "green"
+                          : "red",
+                      borderColor:
+                        item.status === "Unconfirmed"
+                          ? null
+                          : item.status === "Accepted"
+                          ? "green"
+                          : "red",
+                    }}
+                    classNames={{
+                      root: classes.roundedButton,
+                    }}
+                  >
+                    {item.status}
+                  </Button>
+                </div>
+              </CardSection>
+            ))}
+          </div>
         </Card>
       );
 

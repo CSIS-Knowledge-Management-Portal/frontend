@@ -10,7 +10,9 @@ import {
 import React from "react";
 import { IconMapPin, IconCalendar, IconPlus, IconClock } from "@tabler/icons";
 import { DatePicker, TimeInput } from "@mantine/dates";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import dayjs from "dayjs";
+import axios from "axios";
 
 const useStyles = createStyles((theme) => ({
   Title: {
@@ -93,14 +95,59 @@ const useStyles = createStyles((theme) => ({
 
 function CreatePostPage() {
   const { classes } = useStyles();
-  const [valueFrom, setValueFrom] = React.useState("");
-  const [valueTo, setValueTo] = React.useState("");
-  const [date, setDate] = React.useState("");
-  const [member, setMember] = React.useState([
-    "f20202231@hyderabad.bits-pilani.ac.in",
-  ]);
+  const [source, setSource] = React.useState();
+  const [destination, setDestination] = React.useState();
+  const [date, setDate] = React.useState();
+  const [leavingTime, setLeavingTime] = React.useState();
+  const [waitingTime, setWaitingTime] = React.useState();
+  const [details, setDetails] = React.useState();
+  const [organiser, setOrganiser] = React.useState();
+  const [member, setMember] = React.useState([]);
 
   let navigate = useNavigate();
+
+  const { state } = useLocation();
+
+  React.useEffect(() => {
+    const User = async () => {
+      const data = await axios.get("http://localhost:8000/user/", {
+        headers: { Authorization: localStorage.getItem("SavedToken") },
+      });
+      setOrganiser(data.data.email);
+    };
+    User();
+
+    if (state?.flag) {
+      setSource(state.data.source);
+      setDestination(state.data.destination);
+      setDate(new Date(state.data.departure_date));
+      setLeavingTime(new Date());
+      setWaitingTime(state.data.waiting_time);
+      setDetails(state.data.details);
+      setOrganiser(state.data.creator.email);
+      let members = [];
+      state.data.passengers.map((item, id) => members.push(item.email));
+
+      setMember(members.slice(1, members.length));
+    }
+  }, []);
+
+  const Update = async () => {
+    const data = await axios({
+      method: "patch",
+      url: `http://localhost:8000/api/trip/update/${state?.data.id}`,
+      headers: { Authorization: localStorage.getItem("SavedToken") },
+      data: {
+        source: source,
+        destination: destination,
+        departure_date: date,
+        departure_time: leavingTime,
+        waiting_time: waitingTime,
+        details: details,
+      },
+    });
+    navigate("/upcoming-trips");
+  };
 
   return (
     <>
@@ -108,14 +155,16 @@ function CreatePostPage() {
         Go Back
       </Button>
       <div className={classes.wrapper}>
-        <Text className={classes.pageTitle}>Create New Post</Text>
+        <Text className={classes.pageTitle}>
+          {state?.flag ? "Update/View Post" : "Create New Post"}
+        </Text>
         <TextInput
           className={classes.form}
           placeholder="From"
           label="Source"
-          onChange={(event) => setValueFrom(event.currentTarget.value)}
-          value={valueFrom}
-          withAsterisk
+          onChange={(event) => setSource(event.currentTarget.value)}
+          value={source}
+          required
           rightSection={
             <ActionIcon
               style={{
@@ -130,22 +179,22 @@ function CreatePostPage() {
         />
         <Chip.Group
           className={classes.chip}
-          value={valueFrom}
-          onChange={setValueFrom}
+          value={source}
+          onChange={setSource}
         >
-          <Chip value="campus">Campus</Chip>
-          <Chip value="airport">Airport</Chip>
-          <Chip value="f3">F3</Chip>
-          <Chip value="bnb">BnB</Chip>
-          <Chip value="rlwstn">Rlw Stn</Chip>
+          <Chip value="Campus">Campus</Chip>
+          <Chip value="Airport">Airport</Chip>
+          <Chip value="F3">F3</Chip>
+          <Chip value="BnB">BnB</Chip>
+          <Chip value="Railway Stn">Rlw Stn</Chip>
         </Chip.Group>
         <TextInput
           className={classes.form}
           placeholder="To"
           label="Destination"
-          onChange={(event) => setValueTo(event.currentTarget.value)}
-          value={valueTo}
-          withAsterisk
+          onChange={(event) => setDestination(event.currentTarget.value)}
+          value={destination}
+          required
           rightSection={
             <ActionIcon
               style={{
@@ -160,78 +209,103 @@ function CreatePostPage() {
         />
         <Chip.Group
           className={classes.chip}
-          value={valueTo}
-          onChange={setValueTo}
+          value={destination}
+          onChange={setDestination}
         >
-          <Chip value="campus">Campus</Chip>
-          <Chip value="airport">Airport</Chip>
-          <Chip value="f3">F3</Chip>
-          <Chip value="bnb">BnB</Chip>
-          <Chip value="rlwstn">Rlw Stn</Chip>
+          <Chip value="Campus">Campus</Chip>
+          <Chip value="Airport">Airport</Chip>
+          <Chip value="F3">F3</Chip>
+          <Chip value="BnB">BnB</Chip>
+          <Chip value="Railway Stn">Rlw Stn</Chip>
         </Chip.Group>
 
         <DatePicker
           className={classes.form}
           placeholder="Select from Calendar"
+          minDate={dayjs(new Date()).toDate()}
+          maxDate={null}
           label="Date"
-          withAsterisk
-          onChange={setDate}
+          required
+          defaultValue={date}
+          inputFormat="YYYY-MM-DD"
+          onChange={(value) => setDate(dayjs(value).format("YYYY-MM-DD"))}
           rightSection={<IconCalendar size={20} />}
         />
         <TimeInput
           className={classes.form}
-          defaultValue={new Date()}
+          onChange={(value) => setLeavingTime(dayjs(value).format("HH:mm:ss"))}
           label="Leaving time"
-          format="12"
-          amLabel="am"
-          pmLabel="pm"
-          icon={<IconClock size={16} />}
-          withAsterisk
-        />
-        <TimeInput
-          className={classes.form}
-          clearable
-          label="Waiting time"
           format="24"
           icon={<IconClock size={16} />}
-          withAsterisk
+          required
+          defaultValue={leavingTime}
+          // defaultValue={
+          //   new Date(
+          //     dayjs(state.data.departure_date).format("MMMM D, YYYY") +
+          //       state.data.departure_time
+          //   )
+          // }
+        />
+        <TextInput
+          className={classes.form}
+          onChange={(event) => setWaitingTime(event.currentTarget.value)}
+          label="Waiting time"
+          rightSection={<IconClock size={16} />}
+          value={waitingTime}
+          required
         />
         <Textarea
           className={classes.form}
           placeholder="Your comment"
           label="Additional Info"
-          withAsterisk
+          onChange={(event) => setDetails(event.currentTarget.value)}
+          required
+          value={details}
           autosize
           minRows={2}
           maxRows={4}
         />
         <TextInput
           className={classes.form}
-          placeholder="To"
-          label="Members"
-          onChange={(event) => setValueTo(event.currentTarget.value)}
-          value={member}
-          withAsterisk
+          label="Organiser"
+          value={organiser}
+          required
           disabled
-          rightSection={
-            <ActionIcon
-              style={{
-                borderLeftColor: "white",
-                borderWidth: 1,
-              }}
-              onClick={() => console.log("hello")}
-            >
-              <IconPlus size={20} />
-            </ActionIcon>
-          }
         />
+        {state?.flag ? null : (
+          <Textarea
+            className={classes.form}
+            placeholder="Members Email separated by comma"
+            label="Members"
+            onChange={(event) => setMember(event.currentTarget.value)}
+            required
+            value={member}
+            autosize
+            minRows={2}
+            maxRows={4}
+          />
+        )}
         <Button
           color={"customDark.0"}
           variant="outline"
           className={classes.button}
-          onClick={() => navigate("/choose-vendor")}
+          onClick={() =>
+            state?.flag
+              ? Update()
+              : navigate("/choose-vendor", {
+                  state: {
+                    source: source,
+                    destination: destination,
+                    departure_date: date,
+                    departure_time: leavingTime,
+                    waiting_time: waitingTime,
+                    details: details,
+                    passengers: member.toString(),
+                  },
+                })
+          }
         >
-          Next
+          {state?.flag ? "Update" : "Next"}
         </Button>
       </div>
     </>

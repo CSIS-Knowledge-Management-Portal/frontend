@@ -1,4 +1,5 @@
 import { Text, createStyles, Button } from "@mantine/core";
+import axios from "axios";
 import React from "react";
 import { useNavigate } from "react-router";
 import CustomDiv from "../components/CustomDiv";
@@ -85,7 +86,28 @@ const useStyles = createStyles((theme) => ({
 
 function UpcomingTripsPage() {
   const { classes } = useStyles();
+  const [upcomingPosts, setUpcomingPosts] = React.useState(null);
+  const [email, setEmail] = React.useState(null);
+
   let navigate = useNavigate();
+
+  React.useEffect(() => {
+    const Posts = async () => {
+      const data = await axios.get("http://localhost:8000/api/trip/upcoming", {
+        headers: { Authorization: localStorage.getItem("SavedToken") },
+      });
+      setUpcomingPosts(data.data);
+    };
+    const User = async () => {
+      const data = await axios.get("http://localhost:8000/user/", {
+        headers: { Authorization: localStorage.getItem("SavedToken") },
+      });
+      setEmail(data.data.email);
+    };
+    User();
+    Posts();
+  }, []);
+  console.log(upcomingPosts);
   return (
     <>
       <Button variant="subtle" onClick={() => navigate(-1)}>
@@ -93,8 +115,8 @@ function UpcomingTripsPage() {
       </Button>
       <div className={classes.wrapper}>
         <Text className={classes.pageTitle}>Upcoming Trips</Text>
-        {[1, 1, 1, 1, 1, 1, 1, 1].map(() => (
-          <CustomDiv type={7} />
+        {upcomingPosts?.map((item, id) => (
+          <CustomDiv key={id} type={7} item={item} email={email} />
         ))}
       </div>
     </>

@@ -133,6 +133,7 @@ function Dashboard() {
   const [phone, setPhone] = React.useState();
   const [error, setError] = React.useState(false);
   const [opened, setOpened] = React.useState(false);
+  const [upcomingPosts, setUpcomingPosts] = React.useState(null);
 
   const Phone = async () => {
     if (/^[1-9][0-9]{9}$/.test(phone)) {
@@ -142,7 +143,7 @@ function Dashboard() {
         url: "http://localhost:8000/user/phone",
         headers: { Authorization: localStorage.getItem("SavedToken") },
         data: {
-          phone: "+91" + phone,
+          phone: phone,
         },
       });
       console.log(data.data);
@@ -162,10 +163,41 @@ function Dashboard() {
         headers: { Authorization: localStorage.getItem("SavedToken") },
       });
       setUserDetail(data.data);
-      setPhone(data.data.phone.slice(3, 13));
+      setPhone(data.data.phone);
     };
     User();
+
+    const UpcomingTrips = async () => {
+      const data = await axios.get("http://localhost:8000/api/trip/upcoming", {
+        headers: { Authorization: localStorage.getItem("SavedToken") },
+      });
+      setUpcomingPosts(data.data);
+    };
+    UpcomingTrips();
   }, []);
+
+  const ToPast = async () => {
+    upcomingPosts?.map((item, id) => {
+      if (new Date(item.departure_date) < new Date()) {
+        ToPastCall(item.id);
+      } else console.log(item.departure_date, " is greater than ", new Date());
+    });
+    // window.location.reload();
+  };
+
+  const ToPastCall = async (id) => {
+    const data = await axios({
+      method: "post",
+      url: "http://localhost:8000/api/trip/done",
+      headers: { Authorization: localStorage.getItem("SavedToken") },
+      data: {
+        trip_id: id,
+      },
+    });
+    console.log(data.data);
+  };
+
+  if (upcomingPosts) ToPast();
 
   return (
     <>

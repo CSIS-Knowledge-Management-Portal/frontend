@@ -6,6 +6,7 @@ import {
   CardSection,
   Collapse,
   createStyles,
+  Dialog,
   Text,
 } from "@mantine/core";
 import { IconCheck, IconEdit, IconX } from "@tabler/icons";
@@ -196,9 +197,43 @@ export default function CustomDiv({ type, item, email }) {
   const [received, setReceived] = React.useState();
   const [upcomingPosts, setUpcomingPosts] = React.useState(null);
   const [user, setUser] = React.useState();
+  const [loading1, setLoading1] = React.useState(false);
+  const [opened1, setOpened1] = React.useState(false);
+  const [disabled1, setDisabled1] = React.useState(false);
   let navigate = useNavigate();
 
+  const [loaderAccept, setLoaderAccept] = React.useState(false);
+  const [loaderReject, setLoaderReject] = React.useState(false);
+  const [disabled, setDisabled] = React.useState(false);
+
+  // const Accept = async () => {
+  //   setLoaderAccept(true);
+  //   const data = await axios({
+  //     method: "get",
+  //     url: `http://localhost:8000/api/request/accept?${queryString}`,
+  //     headers: { Authorization: localStorage.getItem("SavedToken") },
+  //   });
+  //   if (data.data) {
+  //     setLoaderAccept(false);
+  //     setDisabled(true);
+  //   }
+  // };
+
+  // const Decline = async () => {
+  //   setLoaderReject(true);
+  //   const data = await axios({
+  //     method: "get",
+  //     url: `http://localhost:8000/api/request/reject?${queryString}`,
+  //     headers: { Authorization: localStorage.getItem("SavedToken") },
+  //   });
+  //   if (data.data) {
+  //     setLoaderReject(false);
+  //     setDisabled(true);
+  //   }
+  // };
+
   const SendRequest = async (item) => {
+    setLoading1(true);
     const data = await axios({
       method: "post",
       url: `http://localhost:8000/api/request/new`,
@@ -210,7 +245,14 @@ export default function CustomDiv({ type, item, email }) {
         creator: item.creator?.email,
       },
     });
-    console.log(data.data);
+    if (data.data) {
+      setLoading1(false);
+      setDisabled1(true);
+      setOpened1(true);
+      setTimeout(() => {
+        setOpened1(false);
+      }, 3000);
+    }
   };
   React.useEffect(() => {
     const User = async () => {
@@ -265,63 +307,77 @@ export default function CustomDiv({ type, item, email }) {
   switch (type) {
     case 1:
       return (
-        <Card withBorder className={classes.wrapper}>
-          <CardSection className={classes.Textbox}>
-            <div className={classes.text}>
-              <Text c="dimmed">To: </Text>
-              <Text>{item.source}</Text>
-            </div>
-            <div className={classes.text}>
-              <Text c="dimmed">From: </Text>
-              <Text>{item.destination}</Text>
-            </div>
-            <div className={classes.text}>
-              <Text c="dimmed">Date: </Text>
-              <Text>{dayjs(item.departure_date).format("MMMM D, YYYY")}</Text>
-            </div>
-            <div className={classes.text}>
-              <Text c="dimmed">Space Available: </Text>
-              <Text>{item.seats - item.passengers.length}</Text>
-            </div>
-            <div className={classes.text}>
-              <Text c="dimmed">Waiting time: </Text>
-              <Text>{item.waiting_time}</Text>
-            </div>
-            <Collapse in={showDetails}>
+        <>
+          <Card withBorder className={classes.wrapper}>
+            <CardSection className={classes.Textbox}>
               <div className={classes.text}>
-                <Text c="dimmed">Details: </Text>
-                <Text>{item.details}</Text>
+                <Text c="dimmed">To: </Text>
+                <Text>{item.source}</Text>
               </div>
-            </Collapse>
-          </CardSection>
-          <CardSection>
-            <Button.Group
-              buttonBorderWidth={0.7}
-              className={classes.buttonGroup}
-            >
-              <Button
-                classNames={{ root: classes.button, label: classes.label }}
-                onClick={() => setShowDetails(!showDetails)}
+              <div className={classes.text}>
+                <Text c="dimmed">From: </Text>
+                <Text>{item.destination}</Text>
+              </div>
+              <div className={classes.text}>
+                <Text c="dimmed">Date: </Text>
+                <Text>{dayjs(item.departure_date).format("MMMM D, YYYY")}</Text>
+              </div>
+              <div className={classes.text}>
+                <Text c="dimmed">Space Available: </Text>
+                <Text>{item.seats - item.passengers.length}</Text>
+              </div>
+              <div className={classes.text}>
+                <Text c="dimmed">Waiting time: </Text>
+                <Text>{item.waiting_time}</Text>
+              </div>
+              <Collapse in={showDetails}>
+                <div className={classes.text}>
+                  <Text c="dimmed">Details: </Text>
+                  <Text>{item.details}</Text>
+                </div>
+              </Collapse>
+            </CardSection>
+            <CardSection>
+              <Button.Group
+                buttonBorderWidth={0.7}
+                className={classes.buttonGroup}
               >
-                {showDetails ? "Hide Details" : "Show Details"}
-              </Button>
-              <Button
-                classNames={{ root: classes.button, label: classes.label }}
-                style={{ borderLeftStyle: "solid" }}
-                onClick={() => SendRequest(item)}
-              >
-                Send Request
-              </Button>
-            </Button.Group>
-          </CardSection>
-        </Card>
+                <Button
+                  classNames={{ root: classes.button, label: classes.label }}
+                  onClick={() => setShowDetails(!showDetails)}
+                >
+                  {showDetails ? "Hide Details" : "Show Details"}
+                </Button>
+                <Button
+                  classNames={{ root: classes.button, label: classes.label }}
+                  style={{ borderLeftStyle: "solid" }}
+                  onClick={() => SendRequest(item)}
+                  loading={loading1}
+                  disabled={disabled1}
+                >
+                  {loading1 ? null : "Send Request"}
+                </Button>
+              </Button.Group>
+            </CardSection>
+          </Card>
+          <Dialog
+            withCloseButton
+            opened={opened1}
+            onClose={() => setOpened1(false)}
+            position={{ bottom: 20, right: 100 }}
+          >
+            <Text color={"green"} style={{ textAlign: "center" }}>
+              Request Sent
+            </Text>
+          </Dialog>
+        </>
       );
 
     case 2:
       return (
         <Card withBorder className={classes.wrapper}>
           <CardSection className={classes.titleBox}>
-            <Text>Approval Pending</Text>
+            <Text>Recieved Requests</Text>
             <Text
               style={{ cursor: "pointer" }}
               onClick={() => navigate("/pending-approval")}
@@ -379,6 +435,9 @@ export default function CustomDiv({ type, item, email }) {
                         },
                       },
                     })}
+                    // loading={loaderAccept}
+                    // disabled={disabled}
+                    // onClick={() => Accept()}
                   >
                     Accept
                   </Button>
@@ -386,6 +445,9 @@ export default function CustomDiv({ type, item, email }) {
                     variant="outline"
                     style={{ color: "red", borderColor: "red" }}
                     classNames={{ root: classes.roundedButton }}
+                    // onClick={() => Decline()}
+                    // loading={loaderReject}
+                    // disabled={disabled}
                   >
                     <IconX size={22} />
                   </ActionIcon>
@@ -435,7 +497,7 @@ export default function CustomDiv({ type, item, email }) {
                     <Text>{item.departure_date}</Text>
                   </div>
                 </div>
-                <Button
+                {/* <Button
                   leftIcon={<IconCheck />}
                   variant="outline"
                   color="blue"
@@ -453,7 +515,7 @@ export default function CustomDiv({ type, item, email }) {
                   })}
                 >
                   Add to Calendar
-                </Button>
+                </Button> */}
               </CardSection>
             ))}
           </div>
@@ -723,7 +785,7 @@ export default function CustomDiv({ type, item, email }) {
       return (
         <Card withBorder className={classes.wrapper}>
           <CardSection className={classes.titleBox}>
-            <Text>Request Sent</Text>
+            <Text>Sent Requests</Text>
             <Text
               style={{ cursor: "pointer" }}
               onClick={() => navigate("/pending-approval")}

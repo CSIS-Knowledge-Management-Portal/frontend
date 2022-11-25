@@ -23,23 +23,34 @@ function RequestApprovalPage() {
 
   let url = window.location.href;
   let queryString = url.split("?")[1];
+  const [loaderAccept, setLoaderAccept] = React.useState(false);
+  const [loaderReject, setLoaderReject] = React.useState(false);
+  const [disabled, setDisabled] = React.useState(false);
 
   const Accept = async () => {
+    setLoaderAccept(true);
     const data = await axios({
       method: "get",
       url: `http://localhost:8000/api/request/accept?${queryString}`,
       headers: { Authorization: localStorage.getItem("SavedToken") },
     });
-    console.log(data.data);
+    if (data.data) {
+      setLoaderAccept(false);
+      setDisabled(true);
+    }
   };
 
   const Decline = async () => {
+    setLoaderReject(true);
     const data = await axios({
       method: "get",
       url: `http://localhost:8000/api/request/reject?${queryString}`,
       headers: { Authorization: localStorage.getItem("SavedToken") },
     });
-    console.log(data.data);
+    if (data.data) {
+      setLoaderReject(false);
+      setDisabled(true);
+    }
   };
 
   return (
@@ -53,11 +64,21 @@ function RequestApprovalPage() {
         </Text>
       </Paper>
       <div>
-        <Button style={{ background: "green" }} onClick={() => Accept()}>
-          Accept
+        <Button
+          style={{ background: "green" }}
+          onClick={() => Accept()}
+          loading={loaderAccept}
+          disabled={disabled}
+        >
+          {loaderAccept ? null : "Accept"}
         </Button>
-        <Button style={{ background: "red" }} onClick={() => Decline()}>
-          Reject
+        <Button
+          style={{ background: "red" }}
+          onClick={() => Decline()}
+          loading={loaderReject}
+          disabled={disabled}
+        >
+          {loaderReject ? null : "Reject"}
         </Button>
       </div>
     </>

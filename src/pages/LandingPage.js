@@ -73,12 +73,9 @@ const useStyles = createStyles((theme) => ({
 function LandingPage() {
   const { classes } = useStyles();
   return (
-    <BackgroundImage src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Marine_Drive_%28BPHC%29.jpg/1280px-Marine_Drive_%28BPHC%29.jpg">
-      <Text color="#fff">
-        BackgroundImage component can be used to add any content on image. It is
-        useful for hero headers and other similar sections
-      </Text>
-    </BackgroundImage>
+    <Title order={1} color="#fff">
+      Please Login to continue.
+    </Title>
   );
 }
 

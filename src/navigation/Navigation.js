@@ -26,7 +26,7 @@ function Navigation() {
     <BrowserRouter>
       <Navbar loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
       <Container>
-        <Routes>
+        {/* <Routes>
           <Route
             path="/"
             element={
@@ -49,7 +49,35 @@ function Navigation() {
           <Route path="/post-details" element={<TripDetail />}>
             <Route path="/post-details:id" element={<TripDetail />} />
           </Route>
-        </Routes>
+        </Routes> */}
+
+        {loggedIn ? (
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/landing" element={<LandingPage />} />
+            <Route path="/posts" element={<Homepage />} />
+            <Route path="/create-post" element={<CreatePostPage />} />
+            <Route path="choose-vendor" element={<ChooseVendorPage />} />
+            <Route path="my-account" element={<MyAccountPage />} />
+            <Route path="past-trips" element={<PastTripsPage />} />
+            <Route path="upcoming-trips" element={<UpcomingTripsPage />} />
+            <Route path="pending-approval" element={<PendingApprovalPage />} />
+            <Route path="/request-approval" element={<RequestApprovalPage />} />
+            <Route path="/post-details" element={<TripDetail />}>
+              <Route path="/post-details:id" element={<TripDetail />} />
+            </Route>
+            <Route path="*" element={<Navigate replace to="/" />} />
+          </Routes>
+        ) : (
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/request-approval" element={<RequestApprovalPage />} />
+            <Route path="/post-details" element={<TripDetail />}>
+              <Route path="/post-details:id" element={<TripDetail />} />
+            </Route>
+            <Route path="*" element={<Navigate replace to="/" />} />
+          </Routes>
+        )}
       </Container>
       <CreatePostButton />
     </BrowserRouter>

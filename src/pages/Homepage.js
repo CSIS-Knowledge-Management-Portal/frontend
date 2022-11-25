@@ -165,6 +165,8 @@ function Homepage() {
     User();
   }, [setPosts]);
 
+  console.log(posts);
+
   const Filter = async () => {
     setOpened(false);
     const data = await axios({
@@ -195,7 +197,7 @@ function Homepage() {
             className={classes.sidePanel}
           >
             <div className={classes.Textbox}>
-              <Text c="dimmed">Source</Text>
+              <Text c="dimmed">Destination</Text>
               <TextInput
                 onChange={(event) => setDest(event.currentTarget.value)}
                 value={src}
@@ -221,7 +223,7 @@ function Homepage() {
               </Chip.Group>
             </div>
             <div className={classes.Textbox}>
-              <Text c="dimmed">Destination</Text>
+              <Text c="dimmed">Source</Text>
               <TextInput
                 onChange={(event) => setDest(event.currentTarget.value)}
                 value={dest}

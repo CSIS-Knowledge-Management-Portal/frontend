@@ -1,7 +1,15 @@
-import { Text, createStyles, Button, Card, Collapse } from "@mantine/core";
+import {
+  Text,
+  createStyles,
+  Button,
+  Card,
+  Collapse,
+  Modal,
+} from "@mantine/core";
 import axios from "axios";
 import React from "react";
 import { useLocation, useNavigate } from "react-router";
+import Private from "../utils/cabs";
 
 const useStyles = createStyles((theme) => ({
   pageTitle: {
@@ -67,6 +75,7 @@ const useStyles = createStyles((theme) => ({
   box: {
     height: 160,
     width: 160,
+    cursor: "pointer",
     [`@media (max-width: ${theme.breakpoints.xl}px)`]: {
       width: "50%",
     },
@@ -135,6 +144,8 @@ function ChooseVendorPage() {
   const { classes } = useStyles();
   const [vendor, setVendor] = React.useState(null);
   const [vehicle, setVehicle] = React.useState(null);
+  const [seats, setSeats] = React.useState(null);
+  const [phone, setPhone] = React.useState(null);
   let navigate = useNavigate();
   const { state } = useLocation();
 
@@ -152,68 +163,76 @@ function ChooseVendorPage() {
         waiting_time: state.waiting_time,
         details: state.details,
         passengers: state.passengers,
-        vendor: vendor,
-        seats: vehicle,
+        vendor: "Private",
+        car_name: vehicle,
+        seats: seats,
+        vendor_phone: phone,
       },
     });
 
     console.log(data.data);
-
-    navigate("/posts");
+    setOpened(true);
   };
+
+  const [opened, setOpened] = React.useState(false);
 
   return (
     <>
       <div className={classes.wrapper}>
         <Text className={classes.pageTitle}>Create New Post</Text>
-        <Text className={classes.pageSubtitle}>Choose Vendor</Text>
+        <Text className={classes.pageSubtitle}>Choose Vehicle</Text>
         <div className={classes.vendorGroup}>
-          <Card
-            className={classes.box}
-            withBorder
-            onClick={() => setVendor("Uber")}
-          />
-          <Card
-            className={classes.box}
-            withBorder
-            onClick={() => setVendor("Ola")}
-          />
-          <Card
-            className={classes.box}
-            withBorder
-            onClick={() => setVendor("Private")}
-          />
+          {Private.map((item, id) => (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Card
+                className={classes.box}
+                withBorder
+                onClick={() => {
+                  setSeats(item.seats);
+                  setVehicle(item.car);
+                  setPhone(item.phone);
+                }}
+              >
+                <Text>{item.car}</Text>
+              </Card>
+              <Text>Capacity: {item.seats}</Text>
+            </div>
+          ))}
         </div>
-        <Collapse in={vendor ? true : false}>
+        {/* <Collapse in={vendor ? true : false}>
           <Text className={classes.pageSubtitle}>Choose Vehicle</Text>
           <div className={classes.vendorGroup}>
-            <Card
-              className={classes.box}
-              withBorder
-              onClick={() => setVehicle(3)}
-            />
-            <Card
-              className={classes.box}
-              withBorder
-              onClick={() => setVehicle(4)}
-            />
-            <Card
-              className={classes.box}
-              withBorder
-              onClick={() => setVehicle(5)}
-            />
-            <Card
-              className={classes.box}
-              withBorder
-              onClick={() => setVehicle(6)}
-            />
-            <Card
-              className={classes.box}
-              withBorder
-              onClick={() => setVehicle(7)}
-            />
+            {Private.map((item, id) => (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Card
+                  className={classes.box}
+                  withBorder
+                  onClick={() => {
+                    setSeats(item.seats);
+                    setVehicle(item.car);
+                    setPhone(item.phone);
+                  }}
+                />
+                <Text>{item.car}</Text>
+                <Text>Capacity: {item.seats}</Text>
+              </div>
+            ))}
           </div>
-        </Collapse>
+        </Collapse> */}
         <Button
           color={"customDark.0"}
           variant="outline"
@@ -223,13 +242,31 @@ function ChooseVendorPage() {
           Previous
         </Button>
         <Button
-          disabled={vendor ? false : true}
+          disabled={vehicle ? false : true}
           className={classes.confirmButton}
           onClick={() => Trip()}
         >
           Confirm Trip
         </Button>
       </div>
+      <Modal
+        opened={opened}
+        onClose={() => setOpened(false)}
+        title="Select Filters"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Text>Trip confirmed!</Text>
+        <Text>
+          Please contact the following number to confirm car details and trip
+          status with the vendor.
+        </Text>
+        <Button onClick={() => navigate("/posts")}>Close</Button>
+      </Modal>
     </>
   );
 }

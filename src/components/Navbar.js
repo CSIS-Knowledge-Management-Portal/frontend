@@ -79,7 +79,7 @@ function Navbar({ loggedIn, setLoggedIn }) {
     xhr.send("credential=" + response.tokenId);
     xhr.onload = function () {
       let data = JSON.parse(xhr.responseText);
-      console.log("Signed in as: ", data.token);
+      console.log("Signed in as: ", data);
       localStorage.setItem("SavedToken", "Bearer " + data.token);
       setLoggedIn(true);
     };
@@ -99,38 +99,52 @@ function Navbar({ loggedIn, setLoggedIn }) {
       <Text onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
         TRAVEL@BPHC
       </Text>
-
       {loggedIn ? (
-        <Menu shadow="md" width={200} position="top-end">
-          <Menu.Target className={classes.avatarContainer}>
-            <div>
-              <Avatar variant="filled" className={classes.avatar} />
-              <IconChevronDown size={14} />
-            </div>
-          </Menu.Target>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
+          <Link to="/">
+            <Button variant="subtle">Dashboard</Button>
+          </Link>
+          <Link to="/create-post">
+            <Button variant="subtle">Create Post</Button>
+          </Link>
+          <Menu shadow="md" width={200} position="top-end">
+            <Menu.Target className={classes.avatarContainer}>
+              <div>
+                <Avatar variant="filled" className={classes.avatar} />
+                <IconChevronDown size={14} />
+              </div>
+            </Menu.Target>
 
-          <Menu.Dropdown>
-            <Menu.Label>Application</Menu.Label>
-            <Link to="/posts">
-              <Menu.Item>All Posts</Menu.Item>
-            </Link>
-            <Link to="/upcoming-trips">
-              <Menu.Item>Upcoming Trips</Menu.Item>
-            </Link>
-            <Link to="/past-trips">
-              <Menu.Item>Past Trips</Menu.Item>
-            </Link>
-            <Link to="/pending-approval">
-              <Menu.Item>Pending Approvals</Menu.Item>
-            </Link>
+            <Menu.Dropdown>
+              <Menu.Label>Application</Menu.Label>
+              <Link to="/posts">
+                <Menu.Item>All Posts</Menu.Item>
+              </Link>
+              <Link to="/upcoming-trips">
+                <Menu.Item>Upcoming Trips</Menu.Item>
+              </Link>
+              <Link to="/past-trips">
+                <Menu.Item>Past Trips</Menu.Item>
+              </Link>
+              <Link to="/pending-approval">
+                <Menu.Item>Pending Approvals</Menu.Item>
+              </Link>
 
-            <Menu.Divider />
+              <Menu.Divider />
 
-            <Menu.Item icon={<IconLogout size={14} />} onClick={Logout}>
-              Logout
-            </Menu.Item>
-          </Menu.Dropdown>
-        </Menu>
+              <Menu.Item icon={<IconLogout size={14} />} onClick={Logout}>
+                Logout
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
+        </div>
       ) : (
         <GoogleLogin
           clientId="980575440299-7v5ap704i43iao1v61atqs3872f1mifr.apps.googleusercontent.com"

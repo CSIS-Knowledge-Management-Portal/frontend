@@ -92,9 +92,12 @@ function PastTripsPage() {
 
   React.useEffect(() => {
     const Posts = async () => {
-      const data = await axios.get("http://localhost:8000/api/trip/past", {
-        headers: { Authorization: localStorage.getItem("SavedToken") },
-      });
+      const data = await axios.get(
+        `${process.env.REACT_APP_ROOT_URL}/api/trip/past`,
+        {
+          headers: { Authorization: localStorage.getItem("SavedToken") },
+        }
+      );
       setPastPosts(data.data);
     };
     Posts();

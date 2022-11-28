@@ -31,7 +31,7 @@ function RequestApprovalPage() {
     setLoaderAccept(true);
     const data = await axios({
       method: "get",
-      url: `http://localhost:8000/api/request/mailaccept?${queryString}`,
+      url: `${process.env.REACT_APP_ROOT_URL}/api/request/mailaccept?${queryString}`,
       headers: { Authorization: localStorage.getItem("SavedToken") },
     });
     if (data.data) {
@@ -44,7 +44,7 @@ function RequestApprovalPage() {
     setLoaderReject(true);
     const data = await axios({
       method: "get",
-      url: `http://localhost:8000/api/request/mailreject?${queryString}`,
+      url: `${process.env.REACT_APP_ROOT_URL}/api/request/mailreject?${queryString}`,
       headers: { Authorization: localStorage.getItem("SavedToken") },
     });
     if (data.data) {

@@ -1,29 +1,85 @@
-const Private = [
+const Cabs = [
   {
-    car: "Mini",
-    seats: 3,
+    name: "Prasanth Cabs",
     phone: "9876543210",
+    cars: [
+      {
+        name: "Swift",
+        capacity: 3,
+      },
+      {
+        name: "WagonR",
+        capacity: 3,
+      },
+      {
+        name: "Etios",
+        capacity: 4,
+      },
+      {
+        name: "Innova",
+        capacity: 6,
+      },
+      ,
+      {
+        name: "Xylo",
+        capacity: 7,
+      },
+    ],
   },
   {
-    car: "Sedan",
-    seats: 4,
+    name: "Reddy Cabs",
     phone: "9876543210",
+    cars: [
+      {
+        name: "Swift",
+        capacity: 3,
+      },
+      {
+        name: "WagonR",
+        capacity: 3,
+      },
+      {
+        name: "Etios",
+        capacity: 4,
+      },
+      {
+        name: "Innova",
+        capacity: 6,
+      },
+      ,
+      {
+        name: "Xylo",
+        capacity: 7,
+      },
+    ],
   },
   {
-    car: "Hatchback",
-    seats: 4,
+    name: "BlaBla Cabs",
     phone: "9876543210",
-  },
-  {
-    car: "Mini SUV",
-    seats: 6,
-    phone: "9876543210",
-  },
-  {
-    car: "SUV",
-    seats: 8,
-    phone: "9876543210",
+    cars: [
+      {
+        name: "Swift",
+        capacity: 3,
+      },
+      {
+        name: "WagonR",
+        capacity: 3,
+      },
+      {
+        name: "Etios",
+        capacity: 4,
+      },
+      {
+        name: "Innova",
+        capacity: 6,
+      },
+      ,
+      {
+        name: "Xylo",
+        capacity: 7,
+      },
+    ],
   },
 ];
 
-export default Private;
+export default Cabs;

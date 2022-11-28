@@ -206,37 +206,41 @@ export default function CustomDiv({ type, item, email }) {
   const [loaderReject, setLoaderReject] = React.useState(false);
   const [disabled, setDisabled] = React.useState(false);
 
-  // const Accept = async () => {
-  //   setLoaderAccept(true);
-  //   const data = await axios({
-  //     method: "get",
-  //     url: `http://localhost:8000/api/request/accept?${queryString}`,
-  //     headers: { Authorization: localStorage.getItem("SavedToken") },
-  //   });
-  //   if (data.data) {
-  //     setLoaderAccept(false);
-  //     setDisabled(true);
-  //   }
-  // };
+  const Accept = async (item) => {
+    setLoaderAccept(true);
+    let trip_id = item?.post_link?.split("/");
+    trip_id = trip_id[trip_id?.length - 1];
+    const data = await axios({
+      method: "get",
+      url: `${process.env.REACT_APP_ROOT_URL}/api/request/accept?id=${item?.sender?.email}&pid=${trip_id}&rid=${item?.id}&plink=${item?.post_link}`,
+      headers: { Authorization: localStorage.getItem("SavedToken") },
+    });
+    if (data.data) {
+      setLoaderAccept(false);
+      setDisabled(true);
+    }
+  };
 
-  // const Decline = async () => {
-  //   setLoaderReject(true);
-  //   const data = await axios({
-  //     method: "get",
-  //     url: `http://localhost:8000/api/request/reject?${queryString}`,
-  //     headers: { Authorization: localStorage.getItem("SavedToken") },
-  //   });
-  //   if (data.data) {
-  //     setLoaderReject(false);
-  //     setDisabled(true);
-  //   }
-  // };
+  const Decline = async (item) => {
+    setLoaderReject(true);
+    let trip_id = item?.post_link?.split("/");
+    trip_id = trip_id[trip_id?.length - 1];
+    const data = await axios({
+      method: "get",
+      url: `${process.env.REACT_APP_ROOT_URL}/api/request/reject?id=${item?.sender?.email}&pid=${trip_id}&rid=${item?.id}&plink=${item?.post_link}`,
+      headers: { Authorization: localStorage.getItem("SavedToken") },
+    });
+    if (data.data) {
+      setLoaderReject(false);
+      setDisabled(true);
+    }
+  };
 
   const Delete = async (id) => {
     console.log("deleting ", id);
     const data = await axios({
       method: "delete",
-      url: `http://localhost:8000/api/trip/delete/${id}`,
+      url: `${process.env.REACT_APP_ROOT_URL}/api/trip/delete/${id}`,
       headers: { Authorization: localStorage.getItem("SavedToken") },
     });
     console.log(data.data);
@@ -247,7 +251,7 @@ export default function CustomDiv({ type, item, email }) {
     setLoading1(true);
     const data = await axios({
       method: "post",
-      url: `http://localhost:8000/api/request/new`,
+      url: `${process.env.REACT_APP_ROOT_URL}/api/request/new`,
       headers: { Authorization: localStorage.getItem("SavedToken") },
       data: {
         trip_link: `http://localhost:3000/post/${item.id}`,
@@ -268,7 +272,7 @@ export default function CustomDiv({ type, item, email }) {
 
   React.useEffect(() => {
     const User = async () => {
-      const data = await axios.get("http://localhost:8000/user/", {
+      const data = await axios.get(`${process.env.REACT_APP_ROOT_URL}/user/`, {
         headers: { Authorization: localStorage.getItem("SavedToken") },
       });
       setUser(data.data);
@@ -276,24 +280,30 @@ export default function CustomDiv({ type, item, email }) {
     User();
 
     const UpcomingTrips = async () => {
-      const data = await axios.get("http://localhost:8000/api/trip/upcoming", {
-        headers: { Authorization: localStorage.getItem("SavedToken") },
-      });
+      const data = await axios.get(
+        `${process.env.REACT_APP_ROOT_URL}/api/trip/upcoming`,
+        {
+          headers: { Authorization: localStorage.getItem("SavedToken") },
+        }
+      );
       setUpcomingPosts(data.data.slice(0, 2));
     };
     UpcomingTrips();
 
     const PastTrips = async () => {
-      const data = await axios.get("http://localhost:8000/api/trip/past", {
-        headers: { Authorization: localStorage.getItem("SavedToken") },
-      });
+      const data = await axios.get(
+        `${process.env.REACT_APP_ROOT_URL}/api/trip/past`,
+        {
+          headers: { Authorization: localStorage.getItem("SavedToken") },
+        }
+      );
       setPastPosts(data.data.slice(0, 2));
     };
     PastTrips();
 
     const ApprovalRecieved = async () => {
       const data = await axios.get(
-        "http://localhost:8000/api/request/all-received",
+        `${process.env.REACT_APP_ROOT_URL}/api/request/all-received`,
         {
           headers: { Authorization: localStorage.getItem("SavedToken") },
         }
@@ -304,7 +314,7 @@ export default function CustomDiv({ type, item, email }) {
 
     const ApprovalSent = async () => {
       const data = await axios.get(
-        "http://localhost:8000/api/request/all-sent",
+        `${process.env.REACT_APP_ROOT_URL}/api/request/all-sent`,
         {
           headers: { Authorization: localStorage.getItem("SavedToken") },
         }
@@ -312,7 +322,9 @@ export default function CustomDiv({ type, item, email }) {
       setSent(data.data.slice(0, 2));
     };
     ApprovalSent();
-  }, []);
+  }, [disabled]);
+
+  console.log("received", received);
 
   switch (type) {
     case 1:
@@ -365,12 +377,16 @@ export default function CustomDiv({ type, item, email }) {
                 <Button
                   classNames={{ root: classes.button, label: classes.label }}
                   style={{
+                    buttonBorderWidth: 0.7,
+                    borderTopStyle: "solid",
                     borderLeftStyle: "solid",
-                    color:
+                    borderColor: "white",
+                    color: "white",
+                    background:
                       match?.status === "Accepted"
                         ? "green"
                         : match?.status === "Unconfirmed"
-                        ? "white"
+                        ? "gray"
                         : null,
                   }}
                   onClick={() => SendRequest(item)}
@@ -432,6 +448,12 @@ export default function CustomDiv({ type, item, email }) {
                   flexDirection: "row",
                   justifyContent: "space-between",
                   alignItems: "center",
+                  transitionDuration: "3s",
+                  display: disabled
+                    ? setTimeout(() => {
+                        return "none";
+                      }, 2000)
+                    : "flex",
                 }}
               >
                 <div>
@@ -465,25 +487,29 @@ export default function CustomDiv({ type, item, email }) {
                     styles={(theme) => ({
                       root: {
                         transitionDuration: "0.2s",
+                        background: disabled ? "green" : null,
                         "&:hover": {
                           color: theme.fn.lighten("#00FF47", 0.05),
                           borderColor: theme.fn.lighten("#00FF47", 0.05),
                         },
                       },
                     })}
-                    // loading={loaderAccept}
-                    // disabled={disabled}
-                    // onClick={() => Accept()}
+                    loading={loaderAccept}
+                    disabled={disabled}
+                    onClick={() => Accept(item)}
                   >
                     Accept
                   </Button>
                   <ActionIcon
                     variant="outline"
-                    style={{ color: "red", borderColor: "red" }}
+                    style={{
+                      color: "red",
+                      borderColor: "red",
+                    }}
                     classNames={{ root: classes.roundedButton }}
-                    // onClick={() => Decline()}
-                    // loading={loaderReject}
-                    // disabled={disabled}
+                    onClick={() => Decline(item)}
+                    loading={loaderReject}
+                    disabled={disabled}
                   >
                     <IconX size={22} />
                   </ActionIcon>
@@ -610,9 +636,9 @@ export default function CustomDiv({ type, item, email }) {
             <div className={classes.text}>
               <Text c="dimmed">Reciever: </Text>
               <Text>
-                {item.receiver.name}
+                {item?.receiver?.name}
                 {" <"}
-                {item.receiver.email}
+                {item?.receiver?.email}
                 {">"}{" "}
               </Text>
             </div>
@@ -681,6 +707,9 @@ export default function CustomDiv({ type, item, email }) {
                 leftIcon={<IconCheck />}
                 classNames={{ root: classes.button, label: classes.label }}
                 style={{ color: "#00FF47" }}
+                loading={loaderAccept}
+                disabled={disabled}
+                onClick={() => Accept(item)}
               >
                 Accept
               </Button>
@@ -688,6 +717,9 @@ export default function CustomDiv({ type, item, email }) {
                 leftIcon={<IconX />}
                 classNames={{ root: classes.button, label: classes.label }}
                 style={{ borderLeftStyle: "solid", color: "red" }}
+                onClick={() => Decline(item)}
+                loading={loaderReject}
+                disabled={disabled}
               >
                 Decline
               </Button>

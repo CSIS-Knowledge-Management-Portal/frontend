@@ -74,7 +74,7 @@ function Navbar({ loggedIn, setLoggedIn }) {
   const Login = async (response) => {
     console.log(response.tokenId);
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://localhost:8000/user/auth");
+    xhr.open("POST", `${process.env.REACT_APP_ROOT_URL}/user/auth`);
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     xhr.send("credential=" + response.tokenId);
     xhr.onload = function () {

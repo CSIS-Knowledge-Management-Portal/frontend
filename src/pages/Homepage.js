@@ -147,7 +147,7 @@ function Homepage() {
   React.useEffect(() => {
     const Posts = async () => {
       const data = await axios.get(
-        "http://localhost:8000/api/trip/all-active",
+        `${process.env.REACT_APP_ROOT_URL}/api/trip/all-active`,
         {
           headers: { Authorization: localStorage.getItem("SavedToken") },
         }
@@ -157,7 +157,7 @@ function Homepage() {
     Posts();
 
     const User = async () => {
-      const data = await axios.get("http://localhost:8000/user/", {
+      const data = await axios.get(`${process.env.REACT_APP_ROOT_URL}/user/`, {
         headers: { Authorization: localStorage.getItem("SavedToken") },
       });
       setEmail(data.data.email);
@@ -171,7 +171,7 @@ function Homepage() {
     setOpened(false);
     const data = await axios({
       method: "get",
-      url: `http://localhost:8000/api/trip/all-active?${
+      url: `${process.env.REACT_APP_ROOT_URL}/api/trip/all-active?${
         dest.length > 0 ? "dest=" + dest + "&" : ""
       }${src.length > 0 ? "src=" + src + "&" : ""}${
         dt.length > 0 ? "dt=" + dt : ""

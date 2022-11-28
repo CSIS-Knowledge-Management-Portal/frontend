@@ -99,8 +99,8 @@ function CreatePostPage() {
   const { classes } = useStyles();
   const [source, setSource] = React.useState();
   const [destination, setDestination] = React.useState();
-  const [date, setDate] = React.useState();
-  const [leavingTime, setLeavingTime] = React.useState();
+  const [date, setDate] = React.useState(new Date());
+  const [leavingTime, setLeavingTime] = React.useState(new Date());
   const [waitingTime, setWaitingTime] = React.useState();
   const [details, setDetails] = React.useState();
   const [organiser, setOrganiser] = React.useState();
@@ -114,7 +114,7 @@ function CreatePostPage() {
 
   React.useEffect(() => {
     const User = async () => {
-      const data = await axios.get("http://localhost:8000/user/", {
+      const data = await axios.get(`${process.env.REACT_APP_ROOT_URL}/user/`, {
         headers: { Authorization: localStorage.getItem("SavedToken") },
       });
       setOrganiser(data.data.email);
@@ -124,10 +124,14 @@ function CreatePostPage() {
     User();
 
     if (state?.flag) {
+      console.log(state);
       setSource(state.data.source);
       setDestination(state.data.destination);
-      setDate(new Date(state.data.departure_date));
-      setLeavingTime(new Date());
+      var parts = state.data.departure_date.split("-");
+      setDate(new Date(parts[0], parts[1] - 1, parts[2]));
+      setLeavingTime(
+        new Date(state.data.departure_date + "T" + state.data.departure_time)
+      );
       setWaitingTime(state.data.waiting_time);
       setDetails(state.data.details);
       setOrganiser(state.data.creator.email);
@@ -138,18 +142,21 @@ function CreatePostPage() {
     }
 
     const AllUser = async () => {
-      const data = await axios.get("http://localhost:8000/user/all", {
-        headers: { Authorization: localStorage.getItem("SavedToken") },
-      });
+      const data = await axios.get(
+        `${process.env.REACT_APP_ROOT_URL}/user/all`,
+        {
+          headers: { Authorization: localStorage.getItem("SavedToken") },
+        }
+      );
       setAllUsers(data?.data?.map((item) => ({ ...item, value: item.email })));
     };
     AllUser();
   }, [noOfMembers]);
 
   const Update = async () => {
-    const data = await axios({
+    await axios({
       method: "patch",
-      url: `http://localhost:8000/api/trip/update/${state?.data.id}`,
+      url: `${process.env.REACT_APP_ROOT_URL}/api/trip/update/${state?.data.id}`,
       headers: { Authorization: localStorage.getItem("SavedToken") },
       data: {
         source: source,
@@ -162,8 +169,6 @@ function CreatePostPage() {
     });
     navigate("/upcoming-trips");
   };
-
-  console.log([...member].join(","));
 
   return (
     <>
@@ -242,7 +247,7 @@ function CreatePostPage() {
           maxDate={null}
           label="Date"
           required
-          defaultValue={date}
+          value={date}
           inputFormat="YYYY-MM-DD"
           onChange={(value) => setDate(dayjs(value).format("YYYY-MM-DD"))}
           rightSection={<IconCalendar size={20} />}
@@ -254,13 +259,8 @@ function CreatePostPage() {
           format="24"
           icon={<IconClock size={16} />}
           required
-          defaultValue={leavingTime}
-          // defaultValue={
-          //   new Date(
-          //     dayjs(state.data.departure_date).format("MMMM D, YYYY") +
-          //       state.data.departure_time
-          //   )
-          // }
+          // defaultValue={new Date()}
+          value={leavingTime}
         />
         <TextInput
           className={classes.form}

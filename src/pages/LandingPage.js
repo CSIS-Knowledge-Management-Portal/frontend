@@ -97,7 +97,7 @@ function LandingPage({ loggedIn, setLoggedIn }) {
   const Login = async (response) => {
     console.log(response.tokenId);
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://localhost:8000/user/auth");
+    xhr.open("POST", `${process.env.REACT_APP_ROOT_URL}/user/auth`);
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     xhr.send("credential=" + response.tokenId);
     xhr.onload = function () {
@@ -122,7 +122,7 @@ function LandingPage({ loggedIn, setLoggedIn }) {
         </Title>
         <Button.Group className={classes.ButtonGroup}>
           <GoogleLogin
-            clientId="980575440299-7v5ap704i43iao1v61atqs3872f1mifr.apps.googleusercontent.com"
+            clientId={process.env.REACT_APP_GOOGLE_CLIENT_KEY}
             theme="dark"
             render={(renderProps) => (
               <Button variant="outline" onClick={renderProps.onClick}>

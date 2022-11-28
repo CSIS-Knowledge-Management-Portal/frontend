@@ -140,7 +140,7 @@ function Dashboard() {
       setError(false);
       const data = await axios({
         method: "patch",
-        url: "http://localhost:8000/user/phone",
+        url: `${process.env.REACT_APP_ROOT_URL}/user/phone`,
         headers: { Authorization: localStorage.getItem("SavedToken") },
         data: {
           phone: phone,
@@ -163,7 +163,7 @@ function Dashboard() {
   React.useEffect(() => {
     const User = async () => {
       console.log("sent");
-      const data = await axios.get("http://localhost:8000/user/", {
+      const data = await axios.get(`${process.env.REACT_APP_ROOT_URL}/user/`, {
         headers: { Authorization: localStorage.getItem("SavedToken") },
       });
       setUserDetail(data.data);
@@ -172,9 +172,12 @@ function Dashboard() {
     User();
 
     const UpcomingTrips = async () => {
-      const data = await axios.get("http://localhost:8000/api/trip/upcoming", {
-        headers: { Authorization: localStorage.getItem("SavedToken") },
-      });
+      const data = await axios.get(
+        `${process.env.REACT_APP_ROOT_URL}/api/trip/upcoming`,
+        {
+          headers: { Authorization: localStorage.getItem("SavedToken") },
+        }
+      );
       setUpcomingPosts(data.data);
     };
     UpcomingTrips();
@@ -192,7 +195,7 @@ function Dashboard() {
   const ToPastCall = async (id) => {
     const data = await axios({
       method: "post",
-      url: "http://localhost:8000/api/trip/done",
+      url: `${process.env.REACT_APP_ROOT_URL}/api/trip/done`,
       headers: { Authorization: localStorage.getItem("SavedToken") },
       data: {
         trip_id: id,

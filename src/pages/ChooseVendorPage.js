@@ -5,11 +5,13 @@ import {
   Card,
   Collapse,
   Modal,
+  Accordion,
 } from "@mantine/core";
 import axios from "axios";
 import React from "react";
 import { useLocation, useNavigate } from "react-router";
-import Private from "../utils/cabs";
+import Cabs from "../utils/cabs";
+import Autos from "../utils/Auto";
 
 const useStyles = createStyles((theme) => ({
   pageTitle: {
@@ -68,13 +70,17 @@ const useStyles = createStyles((theme) => ({
 
   vendorGroup: {
     display: "flex",
-    flexDirection: "row",
+    flexDirection: "column",
     justifyContent: "space-evenly",
   },
 
   box: {
-    height: 160,
-    width: 160,
+    height: 70,
+    width: 150,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
     cursor: "pointer",
     [`@media (max-width: ${theme.breakpoints.xl}px)`]: {
       width: "50%",
@@ -153,7 +159,7 @@ function ChooseVendorPage() {
     console.log(state);
     const data = await axios({
       method: "post",
-      url: "http://localhost:8000/api/trip/create",
+      url: `${process.env.REACT_APP_ROOT_URL}/api/trip/create`,
       headers: { Authorization: localStorage.getItem("SavedToken") },
       data: {
         source: state.source,
@@ -163,7 +169,7 @@ function ChooseVendorPage() {
         waiting_time: state.waiting_time,
         details: state.details,
         passengers: state.passengers,
-        vendor: "Private",
+        vendor: "Cabs",
         car_name: vehicle,
         seats: seats,
         vendor_phone: phone,
@@ -180,60 +186,70 @@ function ChooseVendorPage() {
   return (
     <>
       <div className={classes.wrapper}>
-        <Text className={classes.pageTitle}>Create New Post</Text>
-        <Text className={classes.pageSubtitle}>Choose Vehicle</Text>
+        <Text className={classes.pageTitle}>Available Vendors</Text>
+        <Text className={classes.pageSubtitle}>Cabs</Text>
         <div className={classes.vendorGroup}>
-          {Private.map((item, id) => (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Card
-                className={classes.box}
-                withBorder
-                onClick={() => {
-                  setSeats(item.seats);
-                  setVehicle(item.car);
-                  setPhone(item.phone);
-                }}
-              >
-                <Text>{item.car}</Text>
-              </Card>
-              <Text>Capacity: {item.seats}</Text>
-            </div>
-          ))}
-        </div>
-        {/* <Collapse in={vendor ? true : false}>
-          <Text className={classes.pageSubtitle}>Choose Vehicle</Text>
-          <div className={classes.vendorGroup}>
-            {Private.map((item, id) => (
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Card
-                  className={classes.box}
-                  withBorder
-                  onClick={() => {
-                    setSeats(item.seats);
-                    setVehicle(item.car);
-                    setPhone(item.phone);
-                  }}
-                />
-                <Text>{item.car}</Text>
-                <Text>Capacity: {item.seats}</Text>
-              </div>
+          <Accordion variant="contained">
+            {Cabs.map((item, id) => (
+              <Accordion.Item value={item.name}>
+                <Accordion.Control>
+                  {item.name} - {item.phone}
+                </Accordion.Control>
+                <Accordion.Panel>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      gap: 20,
+                    }}
+                  >
+                    {item.cars.map((item, id) => (
+                      <Card
+                        className={classes.box}
+                        withBorder
+                        onClick={() => {
+                          setVehicle(item.name);
+                          setSeats(item.capacity);
+                        }}
+                      >
+                        <Text>{item.name}</Text>
+                        <Text>Capacity: {item.capacity}</Text>
+                      </Card>
+                    ))}
+                  </div>
+                </Accordion.Panel>
+              </Accordion.Item>
             ))}
-          </div>
-        </Collapse> */}
+          </Accordion>
+          <Text className={classes.pageSubtitle}>Auto</Text>
+          <Accordion variant="contained">
+            {Autos.map((item, id) => (
+              <Accordion.Item value={item.name}>
+                <Accordion.Control>
+                  {item.name} - {item.phone}
+                </Accordion.Control>
+                <Accordion.Panel>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                    onClick={() => {
+                      setVehicle(item.name);
+                      setSeats(item.capacity);
+                    }}
+                  >
+                    <Text>Capacity: {item.capacity}</Text>
+                    <Button variant="outline">Select</Button>
+                  </div>
+                </Accordion.Panel>
+              </Accordion.Item>
+            ))}
+          </Accordion>
+        </div>
+
         <Button
           color={"customDark.0"}
           variant="outline"

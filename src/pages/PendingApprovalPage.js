@@ -56,7 +56,7 @@ function PendingApprovalPage() {
   React.useEffect(() => {
     const Sent = async () => {
       const data = await axios.get(
-        "http://localhost:8000/api/request/all-sent",
+        `${process.env.REACT_APP_ROOT_URL}/api/request/all-sent`,
         {
           headers: { Authorization: localStorage.getItem("SavedToken") },
         }
@@ -67,7 +67,7 @@ function PendingApprovalPage() {
 
     const Received = async () => {
       const data = await axios.get(
-        "http://localhost:8000/api/request/all-received",
+        `${process.env.REACT_APP_ROOT_URL}/api/request/all-received`,
         {
           headers: { Authorization: localStorage.getItem("SavedToken") },
         }

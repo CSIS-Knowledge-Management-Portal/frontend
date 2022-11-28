@@ -93,13 +93,16 @@ function UpcomingTripsPage() {
 
   React.useEffect(() => {
     const Posts = async () => {
-      const data = await axios.get("http://localhost:8000/api/trip/upcoming", {
-        headers: { Authorization: localStorage.getItem("SavedToken") },
-      });
+      const data = await axios.get(
+        `${process.env.REACT_APP_ROOT_URL}/api/trip/upcoming`,
+        {
+          headers: { Authorization: localStorage.getItem("SavedToken") },
+        }
+      );
       setUpcomingPosts(data.data);
     };
     const User = async () => {
-      const data = await axios.get("http://localhost:8000/user/", {
+      const data = await axios.get(`${process.env.REACT_APP_ROOT_URL}/user/`, {
         headers: { Authorization: localStorage.getItem("SavedToken") },
       });
       setEmail(data.data.email);

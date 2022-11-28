@@ -102,9 +102,12 @@ function TripDetail() {
 
   React.useEffect(() => {
     const Post = async () => {
-      const data = await axios.get(`http://localhost:8000/api/trip/${id}`, {
-        headers: { Authorization: localStorage.getItem("SavedToken") },
-      });
+      const data = await axios.get(
+        `${process.env.REACT_APP_ROOT_URL}/api/trip/${id}`,
+        {
+          headers: { Authorization: localStorage.getItem("SavedToken") },
+        }
+      );
       setPost(data.data);
     };
     Post();

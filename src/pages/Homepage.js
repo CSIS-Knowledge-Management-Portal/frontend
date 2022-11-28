@@ -15,7 +15,7 @@ import { IconCalendar, IconX } from "@tabler/icons";
 import axios from "axios";
 import dayjs from "dayjs";
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import CustomDiv from "../components/CustomDiv";
 
 const useStyles = createStyles((theme) => ({
@@ -165,7 +165,7 @@ function Homepage() {
     User();
   }, [setPosts]);
 
-  console.log(posts);
+  console.log("posts", posts);
 
   const Filter = async () => {
     setOpened(false);
@@ -188,7 +188,6 @@ function Homepage() {
       </Button>
       <Text className={classes.pageTitle}>All Posts</Text>
       <Grid className={classes.wrapper} gutter={20}>
-        {/* <Grid.Col lg={1} /> */}
         <Grid.Col lg={4}>
           <Paper
             shadow={"md"}
@@ -198,32 +197,6 @@ function Homepage() {
           >
             <div className={classes.Textbox}>
               <Text c="dimmed">Destination</Text>
-              <TextInput
-                onChange={(event) => setDest(event.currentTarget.value)}
-                value={src}
-                rightSection={
-                  <ActionIcon
-                    disabled={src ? false : true}
-                    onClick={() => setSrc("")}
-                  >
-                    <IconX />
-                  </ActionIcon>
-                }
-              />
-              <Chip.Group
-                className={classes.chip}
-                value={src}
-                onChange={setSrc}
-              >
-                <Chip value="Campus">Campus</Chip>
-                <Chip value="Airport">Airport</Chip>
-                <Chip value="F3">F3</Chip>
-                <Chip value="BnB">BnB</Chip>
-                <Chip value="Railway Stn">Rlw Stn</Chip>
-              </Chip.Group>
-            </div>
-            <div className={classes.Textbox}>
-              <Text c="dimmed">Source</Text>
               <TextInput
                 onChange={(event) => setDest(event.currentTarget.value)}
                 value={dest}
@@ -249,15 +222,50 @@ function Homepage() {
               </Chip.Group>
             </div>
             <div className={classes.Textbox}>
+              <Text c="dimmed">Source</Text>
+              <TextInput
+                onChange={(event) => setSrc(event.currentTarget.value)}
+                value={src}
+                rightSection={
+                  <ActionIcon
+                    disabled={src ? false : true}
+                    onClick={() => setSrc("")}
+                  >
+                    <IconX />
+                  </ActionIcon>
+                }
+              />
+              <Chip.Group
+                className={classes.chip}
+                value={src}
+                onChange={setSrc}
+              >
+                <Chip value="Campus">Campus</Chip>
+                <Chip value="Airport">Airport</Chip>
+                <Chip value="F3">F3</Chip>
+                <Chip value="BnB">BnB</Chip>
+                <Chip value="Railway Stn">Rlw Stn</Chip>
+              </Chip.Group>
+            </div>
+            <div className={classes.Textbox}>
               <Text c="dimmed">Date</Text>
               <DatePicker
                 placeholder="Select from Calendar"
                 minDate={dayjs(new Date()).toDate()}
                 maxDate={null}
-                defaultValue={dt}
+                value={dt}
                 inputFormat="YYYY-MM-DD"
+                clearable
                 onChange={(value) => setDt(dayjs(value).format("YYYY-MM-DD"))}
-                rightSection={<IconCalendar size={20} />}
+                rightSection={
+                  dt ? (
+                    <ActionIcon onClick={() => setDt(null)}>
+                      <IconX />
+                    </ActionIcon>
+                  ) : (
+                    <IconCalendar size={20} />
+                  )
+                }
               />
             </div>
             <Divider />

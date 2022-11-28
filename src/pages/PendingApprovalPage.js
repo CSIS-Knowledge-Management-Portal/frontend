@@ -77,7 +77,7 @@ function PendingApprovalPage() {
     Received();
   }, []);
 
-  console.log(sent);
+  console.log(received);
 
   return (
     <>

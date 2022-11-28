@@ -95,7 +95,10 @@ function Navbar({ loggedIn, setLoggedIn }) {
   React.useEffect(() => {}, [loggedIn]);
 
   return (
-    <div className={classes.wrapper}>
+    <div
+      className={classes.wrapper}
+      style={{ display: loggedIn ? null : "none" }}
+    >
       <Text onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
         TRAVEL@BPHC
       </Text>

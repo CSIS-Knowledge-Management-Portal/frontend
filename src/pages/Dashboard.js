@@ -148,6 +148,9 @@ function Dashboard() {
       });
       console.log(data.data);
       setOpened(true);
+      setTimeout(() => {
+        setOpened(false);
+      }, 3000);
     } else {
       setError(true);
     }
@@ -155,6 +158,7 @@ function Dashboard() {
 
   let navigate = useNavigate();
   const largeScreen = useMediaQuery("(min-width: 1200px)");
+  console.log(userDetail);
 
   React.useEffect(() => {
     const User = async () => {
@@ -245,18 +249,19 @@ function Dashboard() {
                 variant="outline"
                 className={classes.button}
                 onClick={() => Phone()}
+                disabled={userDetail?.phone != phone ? false : true}
                 type="submit"
               >
                 Update
               </Button>
               <Dialog
-                withCloseButton
+                withCloseButton={false}
                 opened={opened}
                 onClose={() => setOpened(false)}
                 position={{ bottom: 20, right: 100 }}
               >
-                <Text color={"green"} style={{ textAlign: "center" }}>
-                  Phone Number Updated Successfully
+                <Text color={"white"} style={{ textAlign: "center" }}>
+                  Phone Number Updated Successfully 👍
                 </Text>
               </Dialog>
             </div>

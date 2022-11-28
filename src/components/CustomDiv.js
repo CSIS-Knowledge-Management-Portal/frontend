@@ -9,7 +9,7 @@ import {
   Dialog,
   Text,
 } from "@mantine/core";
-import { IconCheck, IconEdit, IconX } from "@tabler/icons";
+import { IconCheck, IconEdit, IconX, IconTrash } from "@tabler/icons";
 import { useNavigate } from "react-router";
 import dayjs from "dayjs";
 import axios from "axios";
@@ -232,6 +232,17 @@ export default function CustomDiv({ type, item, email }) {
   //   }
   // };
 
+  const Delete = async (id) => {
+    console.log("deleting ", id);
+    const data = await axios({
+      method: "delete",
+      url: `http://localhost:8000/api/trip/delete/${id}`,
+      headers: { Authorization: localStorage.getItem("SavedToken") },
+    });
+    console.log(data.data);
+    window.location.reload();
+  };
+
   const SendRequest = async (item) => {
     setLoading1(true);
     const data = await axios({
@@ -361,7 +372,7 @@ export default function CustomDiv({ type, item, email }) {
             </CardSection>
           </Card>
           <Dialog
-            withCloseButton
+            withCloseButton={false}
             opened={opened1}
             onClose={() => setOpened1(false)}
             position={{ bottom: 20, right: 100 }}
@@ -616,23 +627,24 @@ export default function CustomDiv({ type, item, email }) {
           <CardSection className={classes.Textbox}>
             <div className={classes.text}>
               <Text c="dimmed">To: </Text>
-              <Text>Lorem Ipsum</Text>
+              <Text>{item.destination}</Text>
             </div>
             <div className={classes.text}>
               <Text c="dimmed">From: </Text>
-              <Text>Lorem</Text>
+              <Text>{item.source}</Text>
             </div>
             <div className={classes.text}>
               <Text c="dimmed">Date: </Text>
-              <Text>25 Feb 2023</Text>
+              <Text>{dayjs(item.departure_date).format("MMMM D, YYYY")}</Text>
             </div>
             <div className={classes.text}>
-              <Text c="dimmed">Space Available: </Text>
-              <Text>2</Text>
-            </div>
-            <div className={classes.text}>
-              <Text c="dimmed">Waiting time: </Text>
-              <Text>1 hr</Text>
+              <Text c="dimmed">Requested By: </Text>
+              <Text>
+                {item.sender.name}
+                {" <"}
+                {item.sender.email}
+                {">"}
+              </Text>
             </div>
           </CardSection>
           <CardSection>
@@ -710,13 +722,16 @@ export default function CustomDiv({ type, item, email }) {
                 </div>
               </div>
             </div>
-            <div style={{ padding: 0 }}>
+            <div
+              style={{ padding: 0, display: "flex", flexDirection: "column" }}
+            >
               <ActionIcon
                 variant="transparent"
                 disabled={email === item.creator.email ? false : true}
                 style={{
                   height: "100%",
                   borderLeftColor: "white",
+                  borderBottomColor: "white",
                 }}
                 radius={0}
                 size={30}
@@ -729,7 +744,20 @@ export default function CustomDiv({ type, item, email }) {
                   })
                 }
               >
-                <IconEdit style={{ marginLeft: 10 }} />
+                <IconEdit color="skyblue" style={{ marginLeft: 10 }} />
+              </ActionIcon>
+              <ActionIcon
+                variant="transparent"
+                disabled={email === item.creator.email ? false : true}
+                style={{
+                  height: "100%",
+                  borderLeftColor: "white",
+                }}
+                radius={0}
+                size={30}
+                onClick={() => Delete(item.id)}
+              >
+                <IconTrash color="red" style={{ marginLeft: 10 }} />
               </ActionIcon>
             </div>
           </CardSection>

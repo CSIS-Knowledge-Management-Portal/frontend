@@ -25,33 +25,9 @@ function Navigation() {
   return (
     <BrowserRouter>
       <Navbar loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
-      <Container>
-        {/* <Routes>
-          <Route
-            path="/"
-            element={
-              !loggedIn ? <Navigate replace to="/landing" /> : <Dashboard />
-            }
-          />
-          <Route
-            path="/landing"
-            element={loggedIn ? <Navigate replace to="/" /> : <LandingPage />}
-          />
-          <Route path="/landing" element={<LandingPage />} />
-          <Route path="/posts" element={<Homepage />} />
-          <Route path="/create-post" element={<CreatePostPage />} />
-          <Route path="choose-vendor" element={<ChooseVendorPage />} />
-          <Route path="my-account" element={<MyAccountPage />} />
-          <Route path="past-trips" element={<PastTripsPage />} />
-          <Route path="upcoming-trips" element={<UpcomingTripsPage />} />
-          <Route path="pending-approval" element={<PendingApprovalPage />} />
-          <Route path="/request-approval" element={<RequestApprovalPage />} />
-          <Route path="/post-details" element={<TripDetail />}>
-            <Route path="/post-details:id" element={<TripDetail />} />
-          </Route>
-        </Routes> */}
 
-        {loggedIn ? (
+      {loggedIn ? (
+        <Container>
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/landing" element={<LandingPage />} />
@@ -68,17 +44,38 @@ function Navigation() {
             </Route>
             <Route path="*" element={<Navigate replace to="/" />} />
           </Routes>
-        ) : (
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/request-approval" element={<RequestApprovalPage />} />
-            <Route path="/post-details" element={<TripDetail />}>
-              <Route path="/post-details:id" element={<TripDetail />} />
-            </Route>
-            <Route path="*" element={<Navigate replace to="/" />} />
-          </Routes>
-        )}
-      </Container>
+        </Container>
+      ) : (
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <LandingPage loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
+            }
+          />
+
+          <Route
+            path="/request-approval"
+            element={
+              <Container>
+                <RequestApprovalPage />
+              </Container>
+            }
+          />
+          <Route path="/post-details" element={<TripDetail />}>
+            <Route
+              path="/post-details:id"
+              element={
+                <Container>
+                  <TripDetail />
+                </Container>
+              }
+            />
+          </Route>
+          <Route path="*" element={<Navigate replace to="/" />} />
+        </Routes>
+      )}
+
       <CreatePostButton />
     </BrowserRouter>
   );

@@ -265,6 +265,7 @@ export default function CustomDiv({ type, item, email }) {
       }, 3000);
     }
   };
+
   React.useEffect(() => {
     const User = async () => {
       const data = await axios.get("http://localhost:8000/user/", {
@@ -313,10 +314,12 @@ export default function CustomDiv({ type, item, email }) {
     ApprovalSent();
   }, []);
 
-  console.log(sent);
-
   switch (type) {
     case 1:
+      let match = item?.requests.filter(
+        (item) => item?.requestor_email === user?.email
+      );
+      match = match[match?.length - 1];
       return (
         <>
           <Card withBorder className={classes.wrapper}>
@@ -361,12 +364,34 @@ export default function CustomDiv({ type, item, email }) {
                 </Button>
                 <Button
                   classNames={{ root: classes.button, label: classes.label }}
-                  style={{ borderLeftStyle: "solid" }}
+                  style={{
+                    borderLeftStyle: "solid",
+                    color:
+                      match?.status === "Accepted"
+                        ? "green"
+                        : match?.status === "Unconfirmed"
+                        ? "white"
+                        : null,
+                  }}
                   onClick={() => SendRequest(item)}
                   loading={loading1}
-                  disabled={disabled1}
+                  disabled={
+                    disabled1
+                      ? true
+                      : match
+                      ? match?.status === "Rejected"
+                        ? false
+                        : true
+                      : false
+                  }
                 >
-                  {loading1 ? null : "Send Request"}
+                  {loading1
+                    ? null
+                    : match
+                    ? match?.status === "Rejected"
+                      ? "Send Request"
+                      : match?.status
+                    : "Send Request"}
                 </Button>
               </Button.Group>
             </CardSection>

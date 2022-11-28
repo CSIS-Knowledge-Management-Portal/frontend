@@ -12,7 +12,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import CustomDiv from "../components/CustomDiv";
 import BG from "../assets/bg.jpg";
-import { GoogleLogin } from "react-google-login";
+import { GoogleLogin } from "@react-oauth/google";
 
 const useStyles = createStyles((theme) => ({
   Textbox: {
@@ -95,11 +95,11 @@ function LandingPage({ loggedIn, setLoggedIn }) {
   const { classes } = useStyles();
 
   const Login = async (response) => {
-    console.log(response.tokenId);
+    console.log(response.credential);
     var xhr = new XMLHttpRequest();
     xhr.open("POST", `${process.env.REACT_APP_ROOT_URL}/user/auth`);
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    xhr.send("credential=" + response.tokenId);
+    xhr.send("credential=" + response.credential);
     xhr.onload = function () {
       let data = JSON.parse(xhr.responseText);
       console.log("Signed in as: ", data);
@@ -122,15 +122,17 @@ function LandingPage({ loggedIn, setLoggedIn }) {
         </Title>
         <Button.Group className={classes.ButtonGroup}>
           <GoogleLogin
-            clientId={process.env.REACT_APP_GOOGLE_CLIENT_KEY}
+            // clientId={process.env.REACT_APP_GOOGLE_CLIENT_KEY}
             theme="dark"
-            render={(renderProps) => (
-              <Button variant="outline" onClick={renderProps.onClick}>
-                Login with BITS Mail
-              </Button>
-            )}
+            // render={(renderProps) => (
+            //   <Button variant="outline" onClick={renderProps.onClick}>
+            //     Login with BITS Mail
+            //   </Button>
+            // )}
             buttonText="Login"
-            onSuccess={Login}
+            onSuccess={(credentialResponse) => {
+              Login(credentialResponse);
+            }}
             onFailure={Login}
           />
         </Button.Group>

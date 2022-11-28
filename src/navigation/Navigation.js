@@ -15,6 +15,7 @@ import PendingApprovalPage from "../pages/PendingApprovalPage";
 import RequestApprovalPage from "../pages/RequestApprovalPage";
 import TripDetail from "../pages/TripDetail";
 import UpcomingTripsPage from "../pages/UpcomingTripsPage";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 function Navigation() {
   const [loggedIn, setLoggedIn] = React.useState(
@@ -23,61 +24,69 @@ function Navigation() {
 
   React.useEffect(() => {}, [loggedIn]);
   return (
-    <BrowserRouter>
-      <Navbar loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
+    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_KEY}>
+      <BrowserRouter>
+        <Navbar loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
 
-      {loggedIn ? (
-        <Container>
+        {loggedIn ? (
+          <Container>
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/landing" element={<LandingPage />} />
+              <Route path="/posts" element={<Homepage />} />
+              <Route path="/create-post" element={<CreatePostPage />} />
+              <Route path="choose-vendor" element={<ChooseVendorPage />} />
+              <Route path="my-account" element={<MyAccountPage />} />
+              <Route path="past-trips" element={<PastTripsPage />} />
+              <Route path="upcoming-trips" element={<UpcomingTripsPage />} />
+              <Route
+                path="pending-approval"
+                element={<PendingApprovalPage />}
+              />
+              <Route
+                path="/request-approval"
+                element={<RequestApprovalPage />}
+              />
+              <Route path="/post-details" element={<TripDetail />}>
+                <Route path="/post-details:id" element={<TripDetail />} />
+              </Route>
+              <Route path="*" element={<Navigate replace to="/" />} />
+            </Routes>
+          </Container>
+        ) : (
           <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/landing" element={<LandingPage />} />
-            <Route path="/posts" element={<Homepage />} />
-            <Route path="/create-post" element={<CreatePostPage />} />
-            <Route path="choose-vendor" element={<ChooseVendorPage />} />
-            <Route path="my-account" element={<MyAccountPage />} />
-            <Route path="past-trips" element={<PastTripsPage />} />
-            <Route path="upcoming-trips" element={<UpcomingTripsPage />} />
-            <Route path="pending-approval" element={<PendingApprovalPage />} />
-            <Route path="/request-approval" element={<RequestApprovalPage />} />
-            <Route path="/post-details" element={<TripDetail />}>
-              <Route path="/post-details:id" element={<TripDetail />} />
-            </Route>
-            <Route path="*" element={<Navigate replace to="/" />} />
-          </Routes>
-        </Container>
-      ) : (
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <LandingPage loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
-            }
-          />
-
-          <Route
-            path="/request-approval"
-            element={
-              <Container>
-                <RequestApprovalPage />
-              </Container>
-            }
-          />
-          <Route path="/post-details" element={<TripDetail />}>
             <Route
-              path="/post-details:id"
+              path="/"
+              element={
+                <LandingPage loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
+              }
+            />
+
+            <Route
+              path="/request-approval"
               element={
                 <Container>
-                  <TripDetail />
+                  <RequestApprovalPage />
                 </Container>
               }
             />
-          </Route>
-          <Route path="*" element={<Navigate replace to="/" />} />
-        </Routes>
-      )}
+            <Route path="/post-details" element={<TripDetail />}>
+              <Route
+                path="/post-details:id"
+                element={
+                  <Container>
+                    <TripDetail />
+                  </Container>
+                }
+              />
+            </Route>
+            <Route path="*" element={<Navigate replace to="/" />} />
+          </Routes>
+        )}
 
-      <CreatePostButton />
-    </BrowserRouter>
+        <CreatePostButton />
+      </BrowserRouter>
+    </GoogleOAuthProvider>
   );
 }
 

@@ -3,7 +3,7 @@ import React from "react";
 import { IconChevronDown, IconLogout } from "@tabler/icons";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { GoogleLogin } from "react-google-login";
+import { googleLogout } from "@react-oauth/google";
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -88,6 +88,7 @@ function Navbar({ loggedIn, setLoggedIn }) {
   const Logout = () => {
     localStorage.removeItem("SavedToken");
     setLoggedIn(false);
+    googleLogout();
   };
 
   let navigate = useNavigate();
@@ -102,70 +103,52 @@ function Navbar({ loggedIn, setLoggedIn }) {
       <Text onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
         TRAVEL@BPHC
       </Text>
-      {loggedIn ? (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 10,
-          }}
-        >
-          <Link to="/">
-            <Button variant="subtle">Dashboard</Button>
-          </Link>
-          <Link to="/create-post">
-            <Button variant="subtle">Create Post</Button>
-          </Link>
-          <Menu shadow="md" width={200} position="top-end">
-            <Menu.Target className={classes.avatarContainer}>
-              <div>
-                <Avatar variant="filled" className={classes.avatar} />
-                <IconChevronDown size={14} />
-              </div>
-            </Menu.Target>
 
-            <Menu.Dropdown>
-              <Menu.Label>Application</Menu.Label>
-              <Link to="/posts">
-                <Menu.Item>All Posts</Menu.Item>
-              </Link>
-              <Link to="/upcoming-trips">
-                <Menu.Item>Upcoming Trips</Menu.Item>
-              </Link>
-              <Link to="/past-trips">
-                <Menu.Item>Past Trips</Menu.Item>
-              </Link>
-              <Link to="/pending-approval">
-                <Menu.Item>Pending Approvals</Menu.Item>
-              </Link>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 10,
+        }}
+      >
+        <Link to="/">
+          <Button variant="subtle">Dashboard</Button>
+        </Link>
+        <Link to="/create-post">
+          <Button variant="subtle">Create Post</Button>
+        </Link>
+        <Menu shadow="md" width={200} position="top-end">
+          <Menu.Target className={classes.avatarContainer}>
+            <div>
+              <Avatar variant="filled" className={classes.avatar} />
+              <IconChevronDown size={14} />
+            </div>
+          </Menu.Target>
 
-              <Menu.Divider />
+          <Menu.Dropdown>
+            <Menu.Label>Application</Menu.Label>
+            <Link to="/posts">
+              <Menu.Item>All Posts</Menu.Item>
+            </Link>
+            <Link to="/upcoming-trips">
+              <Menu.Item>Upcoming Trips</Menu.Item>
+            </Link>
+            <Link to="/past-trips">
+              <Menu.Item>Past Trips</Menu.Item>
+            </Link>
+            <Link to="/pending-approval">
+              <Menu.Item>Pending Approvals</Menu.Item>
+            </Link>
 
-              <Menu.Item icon={<IconLogout size={14} />} onClick={Logout}>
-                Logout
-              </Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
-        </div>
-      ) : (
-        <GoogleLogin
-          clientId="980575440299-7v5ap704i43iao1v61atqs3872f1mifr.apps.googleusercontent.com"
-          theme="dark"
-          render={(renderProps) => (
-            <Button
-              color={"customDark.0"}
-              variant="outline"
-              onClick={renderProps.onClick}
-            >
-              Login
-            </Button>
-          )}
-          buttonText="Login"
-          onSuccess={Login}
-          onFailure={Login}
-        />
-      )}
+            <Menu.Divider />
+
+            <Menu.Item icon={<IconLogout size={14} />} onClick={Logout}>
+              Logout
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
+      </div>
     </div>
   );
 }

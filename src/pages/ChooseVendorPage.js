@@ -175,6 +175,7 @@ function ChooseVendorPage() {
   };
 
   const [opened, setOpened] = React.useState(false);
+  console.log("pass", state.passengers);
 
   return (
     <>

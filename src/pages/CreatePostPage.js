@@ -6,6 +6,8 @@ import {
   Chip,
   Textarea,
   Button,
+  Autocomplete,
+  NumberInput,
 } from "@mantine/core";
 import React from "react";
 import { IconMapPin, IconCalendar, IconPlus, IconClock } from "@tabler/icons";
@@ -102,7 +104,9 @@ function CreatePostPage() {
   const [waitingTime, setWaitingTime] = React.useState();
   const [details, setDetails] = React.useState();
   const [organiser, setOrganiser] = React.useState();
-  const [member, setMember] = React.useState([]);
+  const [noOfMembers, setNoOfMembers] = React.useState(0);
+  const [member, setMember] = React.useState(new Set());
+  const [allUsers, setAllUsers] = React.useState();
 
   let navigate = useNavigate();
 
@@ -114,6 +118,8 @@ function CreatePostPage() {
         headers: { Authorization: localStorage.getItem("SavedToken") },
       });
       setOrganiser(data.data.email);
+      member.add(data.data.email);
+      setMember(member);
     };
     User();
 
@@ -130,7 +136,15 @@ function CreatePostPage() {
 
       setMember(members.slice(1, members.length));
     }
-  }, []);
+
+    const AllUser = async () => {
+      const data = await axios.get("http://localhost:8000/user/all", {
+        headers: { Authorization: localStorage.getItem("SavedToken") },
+      });
+      setAllUsers(data?.data?.map((item) => ({ ...item, value: item.email })));
+    };
+    AllUser();
+  }, [noOfMembers]);
 
   const Update = async () => {
     const data = await axios({
@@ -148,6 +162,8 @@ function CreatePostPage() {
     });
     navigate("/upcoming-trips");
   };
+
+  console.log([...member].join(","));
 
   return (
     <>
@@ -265,14 +281,8 @@ function CreatePostPage() {
           minRows={2}
           maxRows={4}
         />
-        <TextInput
-          className={classes.form}
-          label="Organiser"
-          value={organiser}
-          required
-          disabled
-        />
-        {state?.flag ? null : (
+
+        {/* {state?.flag ? null : (
           <Textarea
             className={classes.form}
             placeholder="Members Email separated by comma"
@@ -284,6 +294,41 @@ function CreatePostPage() {
             minRows={2}
             maxRows={4}
           />
+        )} */}
+        {allUsers && (
+          <>
+            <NumberInput
+              defaultValue={noOfMembers + 1}
+              min={1}
+              placeholder="Members"
+              withAsterisk
+              onChange={(value) => {
+                if (value - 1 < noOfMembers && value == member.size - 1)
+                  member.delete([...member][member.size - 1]);
+                setNoOfMembers(value - 1);
+              }}
+              className={classes.form}
+              label="Choose members"
+            />
+            <TextInput className={classes.form} value={organiser} disabled />
+            {[...Array(noOfMembers).keys()].map(() => (
+              <Autocomplete
+                placeholder="Type mail or name"
+                className={classes.form}
+                limit={3}
+                onChange={(item) => setMember(member.add(item))}
+                data={allUsers}
+                filter={(value, item) =>
+                  item?.value
+                    .toLowerCase()
+                    .includes(value.toLowerCase().trim()) ||
+                  item?.first_name
+                    .toLowerCase()
+                    .includes(value.toLowerCase().trim())
+                }
+              />
+            ))}
+          </>
         )}
         <Button
           color={"customDark.0"}
@@ -300,7 +345,7 @@ function CreatePostPage() {
                     departure_time: leavingTime,
                     waiting_time: waitingTime,
                     details: details,
-                    passengers: member.toString(),
+                    passengers: [...member].join(","),
                   },
                 })
           }

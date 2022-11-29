@@ -8,6 +8,7 @@ import {
   Button,
   Autocomplete,
   NumberInput,
+  Dialog,
 } from "@mantine/core";
 import React from "react";
 import { IconMapPin, IconCalendar, IconPlus, IconClock } from "@tabler/icons";
@@ -99,14 +100,15 @@ function CreatePostPage() {
   const { classes } = useStyles();
   const [source, setSource] = React.useState();
   const [destination, setDestination] = React.useState();
-  const [date, setDate] = React.useState(new Date());
-  const [leavingTime, setLeavingTime] = React.useState(new Date());
+  const [date, setDate] = React.useState();
+  const [leavingTime, setLeavingTime] = React.useState();
   const [waitingTime, setWaitingTime] = React.useState();
   const [details, setDetails] = React.useState();
   const [organiser, setOrganiser] = React.useState();
   const [noOfMembers, setNoOfMembers] = React.useState(0);
   const [member, setMember] = React.useState(new Set());
   const [allUsers, setAllUsers] = React.useState();
+  const [error, setError] = React.useState(false);
 
   let navigate = useNavigate();
 
@@ -129,8 +131,12 @@ function CreatePostPage() {
       setDestination(state.data.destination);
       var parts = state.data.departure_date.split("-");
       setDate(new Date(parts[0], parts[1] - 1, parts[2]));
+      // setLeavingTime(
+      //   new Date(state.data.departure_date + "T" + state.data.departure_time)
+      // );
+      var time = state.data.departure_time.split(":");
       setLeavingTime(
-        new Date(state.data.departure_date + "T" + state.data.departure_time)
+        new Date(parts[0], parts[1] - 1, parts[2], time[0], time[1], time[2])
       );
       setWaitingTime(state.data.waiting_time);
       setDetails(state.data.details);
@@ -153,7 +159,35 @@ function CreatePostPage() {
     AllUser();
   }, [noOfMembers]);
 
+  const Create = async () => {
+    if (
+      source &&
+      destination &&
+      date &&
+      leavingTime &&
+      waitingTime &&
+      source != destination
+    ) {
+      setError(false);
+      navigate("/choose-vendor", {
+        state: {
+          source: source,
+          destination: destination,
+          departure_date: date,
+          departure_time: dayjs(leavingTime).format("HH:mm:ss"),
+          waiting_time: waitingTime,
+          details: details,
+          passengers: [...member].join(","),
+          noOfMembers: noOfMembers + 1,
+        },
+      });
+    } else {
+      setError(true);
+    }
+  };
+
   const Update = async () => {
+    console.log(dayjs(leavingTime).format("HH:mm:ss"));
     await axios({
       method: "patch",
       url: `${process.env.REACT_APP_ROOT_URL}/api/trip/update/${state?.data.id}`,
@@ -162,7 +196,7 @@ function CreatePostPage() {
         source: source,
         destination: destination,
         departure_date: date,
-        departure_time: leavingTime,
+        departure_time: dayjs(leavingTime).format("HH:mm:ss"),
         waiting_time: waitingTime,
         details: details,
       },
@@ -254,13 +288,12 @@ function CreatePostPage() {
         />
         <TimeInput
           className={classes.form}
-          onChange={(value) => setLeavingTime(dayjs(value).format("HH:mm:ss"))}
+          value={leavingTime}
+          onChange={setLeavingTime}
           label="Leaving time"
           format="24"
           icon={<IconClock size={16} />}
           required
-          // defaultValue={new Date()}
-          value={leavingTime}
         />
         <TextInput
           className={classes.form}
@@ -275,33 +308,18 @@ function CreatePostPage() {
           placeholder="Your comment"
           label="Additional Info"
           onChange={(event) => setDetails(event.currentTarget.value)}
-          required
           value={details}
           autosize
           minRows={2}
           maxRows={4}
         />
 
-        {/* {state?.flag ? null : (
-          <Textarea
-            className={classes.form}
-            placeholder="Members Email separated by comma"
-            label="Members"
-            onChange={(event) => setMember(event.currentTarget.value)}
-            required
-            value={member}
-            autosize
-            minRows={2}
-            maxRows={4}
-          />
-        )} */}
         {allUsers && (
           <>
             <NumberInput
               defaultValue={noOfMembers + 1}
               min={1}
               placeholder="Members"
-              withAsterisk
               onChange={(value) => {
                 if (value - 1 < noOfMembers && value == member.size - 1)
                   member.delete([...member][member.size - 1]);
@@ -330,25 +348,32 @@ function CreatePostPage() {
             ))}
           </>
         )}
+        <Dialog
+          opened={error}
+          withCloseButton
+          onClose={() => setError(false)}
+          size="lg"
+          radius="md"
+          position={{ left: 20, bottom: 20 }}
+        >
+          <Text
+            size="md"
+            color={"red"}
+            style={{ marginBottom: 10 }}
+            weight={500}
+          >
+            Error
+          </Text>
+          <Text size="sm" color={"red"} style={{ marginBottom: 10 }}>
+            Please fill all required fields / Destination and source is same
+          </Text>
+        </Dialog>
         <Button
           color={"customDark.0"}
           variant="outline"
           className={classes.button}
-          onClick={() =>
-            state?.flag
-              ? Update()
-              : navigate("/choose-vendor", {
-                  state: {
-                    source: source,
-                    destination: destination,
-                    departure_date: date,
-                    departure_time: leavingTime,
-                    waiting_time: waitingTime,
-                    details: details,
-                    passengers: [...member].join(","),
-                  },
-                })
-          }
+          disabled={error}
+          onClick={() => (state?.flag ? Update() : Create())}
         >
           {state?.flag ? "Update" : "Next"}
         </Button>

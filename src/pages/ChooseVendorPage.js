@@ -91,6 +91,12 @@ const useStyles = createStyles((theme) => ({
     [`@media (max-width: ${theme.breakpoints.md}px)`]: {
       width: "85%",
     },
+
+    "&:hover": {
+      borderColor: "white",
+      borderWidth: 0.7,
+      transitionDuration: "0.3s",
+    },
   },
 
   button: {
@@ -150,13 +156,13 @@ function ChooseVendorPage() {
   const { classes } = useStyles();
   const [vendor, setVendor] = React.useState(null);
   const [vehicle, setVehicle] = React.useState(null);
+  const [vehicleId, setVehicleId] = React.useState(null);
   const [seats, setSeats] = React.useState(null);
   const [phone, setPhone] = React.useState(null);
   let navigate = useNavigate();
   const { state } = useLocation();
 
   const Trip = async () => {
-    console.log(state);
     const data = await axios({
       method: "post",
       url: `${process.env.REACT_APP_ROOT_URL}/api/trip/create`,
@@ -175,13 +181,12 @@ function ChooseVendorPage() {
         vendor_phone: phone,
       },
     });
-
     console.log(data.data);
     setOpened(true);
   };
 
   const [opened, setOpened] = React.useState(false);
-  console.log("pass", state.passengers);
+  console.log("pass", state.departure_time);
 
   return (
     <>
@@ -204,19 +209,26 @@ function ChooseVendorPage() {
                       gap: 20,
                     }}
                   >
-                    {item.cars.map((item, id) => (
-                      <Card
-                        className={classes.box}
-                        withBorder
-                        onClick={() => {
-                          setVehicle(item.name);
-                          setSeats(item.capacity);
-                        }}
-                      >
-                        <Text>{item.name}</Text>
-                        <Text>Capacity: {item.capacity}</Text>
-                      </Card>
-                    ))}
+                    {item.cars.map((item, id) =>
+                      state.noOfMembers <= item.capacity ? (
+                        <Card
+                          className={classes.box}
+                          withBorder
+                          onClick={() => {
+                            setVehicle(item.name);
+                            setVehicleId(item.id);
+                            setSeats(item.capacity);
+                          }}
+                          style={{
+                            borderColor: vehicleId === item.id ? "white" : null,
+                            transitionDuration: "0.3s",
+                          }}
+                        >
+                          <Text>{item.name}</Text>
+                          <Text>Capacity: {item.capacity}</Text>
+                        </Card>
+                      ) : null
+                    )}
                   </div>
                 </Accordion.Panel>
               </Accordion.Item>
@@ -269,7 +281,7 @@ function ChooseVendorPage() {
       <Modal
         opened={opened}
         onClose={() => setOpened(false)}
-        title="Select Filters"
+        title="Trip confirmed!"
         style={{
           display: "flex",
           flexDirection: "column",
@@ -277,12 +289,10 @@ function ChooseVendorPage() {
           alignItems: "center",
         }}
       >
-        <Text>Trip confirmed!</Text>
         <Text>
-          Please contact the following number to confirm car details and trip
-          status with the vendor.
+          Please contact the vendor to confirm car details and trip status.
         </Text>
-        <Button onClick={() => navigate("/posts")}>Close</Button>
+        <Button onClick={() => navigate("/posts")}>Got it!</Button>
       </Modal>
     </>
   );

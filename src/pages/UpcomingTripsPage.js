@@ -101,6 +101,8 @@ function UpcomingTripsPage() {
       );
       setUpcomingPosts(data.data);
     };
+    Posts();
+
     const User = async () => {
       const data = await axios.get(`${process.env.REACT_APP_ROOT_URL}/user/`, {
         headers: { Authorization: localStorage.getItem("SavedToken") },
@@ -108,9 +110,8 @@ function UpcomingTripsPage() {
       setEmail(data.data.email);
     };
     User();
-    Posts();
   }, []);
-  console.log(upcomingPosts);
+
   return (
     <>
       <Button variant="subtle" onClick={() => navigate(-1)}>

@@ -163,6 +163,27 @@ function Homepage() {
       setEmail(data.data.email);
     };
     User();
+
+    const ToPast = async () => {
+      posts?.map((item, id) => {
+        if (new Date(item.departure_date) < new Date()) {
+          ToPastCall(item.id);
+        }
+      });
+    };
+
+    const ToPastCall = async (id) => {
+      await axios({
+        method: "post",
+        url: `${process.env.REACT_APP_ROOT_URL}/api/trip/done`,
+        headers: { Authorization: localStorage.getItem("SavedToken") },
+        data: {
+          trip_id: id,
+        },
+      });
+    };
+
+    if (posts) ToPast();
   }, [setPosts]);
 
   console.log("posts", posts);

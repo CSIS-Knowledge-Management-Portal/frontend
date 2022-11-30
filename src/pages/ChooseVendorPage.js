@@ -159,11 +159,13 @@ function ChooseVendorPage() {
   const [vehicleId, setVehicleId] = React.useState(null);
   const [seats, setSeats] = React.useState(null);
   const [phone, setPhone] = React.useState(null);
+  const [loading, setLoading] = React.useState(false);
   let navigate = useNavigate();
   const { state } = useLocation();
 
   const Trip = async () => {
-    const data = await axios({
+    setLoading(true);
+    await axios({
       method: "post",
       url: `${process.env.REACT_APP_ROOT_URL}/api/trip/create`,
       headers: { Authorization: localStorage.getItem("SavedToken") },
@@ -181,8 +183,8 @@ function ChooseVendorPage() {
         vendor_phone: phone,
       },
     });
-    console.log(data.data);
     setOpened(true);
+    setLoading(false);
   };
 
   const [opened, setOpened] = React.useState(false);
@@ -274,8 +276,9 @@ function ChooseVendorPage() {
           disabled={vehicle ? false : true}
           className={classes.confirmButton}
           onClick={() => Trip()}
+          loading={loading}
         >
-          Confirm Trip
+          {loading ? null : "Confirm Trip"}
         </Button>
       </div>
       <Modal
@@ -292,7 +295,7 @@ function ChooseVendorPage() {
         <Text>
           Please contact the vendor to confirm car details and trip status.
         </Text>
-        <Button onClick={() => navigate("/posts")}>Got it!</Button>
+        <Button onClick={() => navigate("/upcoming-trips")}>Got it!</Button>
       </Modal>
     </>
   );

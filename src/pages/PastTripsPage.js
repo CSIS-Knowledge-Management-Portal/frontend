@@ -1,8 +1,10 @@
-import { Text, createStyles, Button } from "@mantine/core";
+import { Text, createStyles, Button, Center, Loader } from "@mantine/core";
 import axios from "axios";
 import React from "react";
+import Masonry from "react-masonry-css";
 import { useNavigate } from "react-router";
 import CustomDiv from "../components/CustomDiv";
+import { ReactComponent as BlankSVG } from "../assets/undraw_nothing.svg";
 
 const useStyles = createStyles((theme) => ({
   Title: {
@@ -21,7 +23,7 @@ const useStyles = createStyles((theme) => ({
 
   pageTitle: {
     fontSize: 28,
-
+    textAlign: "center",
     [`@media (max-width: ${theme.breakpoints.xl}px)`]: {
       fontSize: 28 * 0.85,
     },
@@ -34,12 +36,12 @@ const useStyles = createStyles((theme) => ({
   },
 
   wrapper: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
+    // display: "flex",
+    // flexDirection: "column",
+    // alignItems: "center",
     marginLeft: "auto",
     marginRight: "auto",
-    width: "50%",
+    width: "65%",
     [`@media (max-width: ${theme.breakpoints.xl}px)`]: {
       width: "60%",
     },
@@ -86,7 +88,8 @@ const useStyles = createStyles((theme) => ({
 
 function PastTripsPage() {
   const { classes } = useStyles();
-  const [pastPosts, setPastPosts] = React.useState(null);
+  let [pastPosts, setPastPosts] = React.useState(null);
+  const [pageLoading, setPageLoading] = React.useState(true);
 
   let navigate = useNavigate();
 
@@ -102,19 +105,49 @@ function PastTripsPage() {
     };
     Posts();
   }, []);
-  console.log(pastPosts);
-  return (
+
+  pastPosts = pastPosts?.map(function (item, id) {
+    return <CustomDiv type={4} key={id} item={item} />;
+  });
+
+  if (pageLoading && pastPosts) {
+    setPageLoading(false);
+  }
+
+  return !pageLoading ? (
     <>
       <Button variant="subtle" onClick={() => navigate(-1)}>
         Go Back
       </Button>
+
+      <Text className={classes.pageTitle}>Past Trips</Text>
       <div className={classes.wrapper}>
-        <Text className={classes.pageTitle}>Past Trips</Text>
-        {pastPosts?.map((item, id) => (
-          <CustomDiv type={4} key={id} item={item} />
-        ))}
+        <Masonry
+          breakpointCols={{ default: 2, 770: 1 }}
+          className="my-masonry-grid"
+          columnClassName="my-masonry-grid_column"
+        >
+          {pastPosts.length > 0 ? (
+            pastPosts
+          ) : (
+            <BlankSVG
+              width={"50%"}
+              height={"50%"}
+              style={{
+                marginLeft: "auto",
+                marginRight: "auto",
+                marginTop: "40%",
+                transform: "translate(30px, -50%)",
+              }}
+            />
+          )}
+        </Masonry>
       </div>
     </>
+  ) : (
+    <Center style={{ width: "100%", height: "100%" }}>
+      <Loader />
+    </Center>
   );
 }
 

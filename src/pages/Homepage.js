@@ -9,6 +9,8 @@ import {
   Chip,
   Divider,
   Modal,
+  Center,
+  Loader,
 } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { IconCalendar, IconX } from "@tabler/icons";
@@ -17,6 +19,7 @@ import dayjs from "dayjs";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import CustomDiv from "../components/CustomDiv";
+import { ReactComponent as BlankSVG } from "../assets/undraw_nothing.svg";
 
 const useStyles = createStyles((theme) => ({
   pageTitle: {
@@ -143,6 +146,8 @@ function Homepage() {
   const [src, setSrc] = React.useState("");
   const [dt, setDt] = React.useState("");
   const [opened, setOpened] = React.useState(false);
+  const [pageLoading, setPageLoading] = React.useState(true);
+  const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
     const Posts = async () => {
@@ -163,32 +168,35 @@ function Homepage() {
       setEmail(data.data.email);
     };
     User();
-
-    const ToPast = async () => {
-      posts?.map((item, id) => {
-        if (new Date(item.departure_date) < new Date()) {
-          ToPastCall(item.id);
-        }
-      });
-    };
-
-    const ToPastCall = async (id) => {
-      await axios({
-        method: "post",
-        url: `${process.env.REACT_APP_ROOT_URL}/api/trip/done`,
-        headers: { Authorization: localStorage.getItem("SavedToken") },
-        data: {
-          trip_id: id,
-        },
-      });
-    };
-
-    if (posts) ToPast();
   }, [setPosts]);
 
-  console.log("posts", posts);
+  if (pageLoading && posts && email) {
+    setPageLoading(false);
+  }
+
+  const ToPast = async () => {
+    posts?.map((item, id) => {
+      if (new Date(item.departure_date) < new Date()) {
+        ToPastCall(item.id);
+      }
+    });
+  };
+
+  const ToPastCall = async (id) => {
+    await axios({
+      method: "post",
+      url: `${process.env.REACT_APP_ROOT_URL}/api/trip/done`,
+      headers: { Authorization: localStorage.getItem("SavedToken") },
+      data: {
+        trip_id: id,
+      },
+    });
+  };
+
+  if (posts) ToPast();
 
   const Filter = async () => {
+    setLoading(true);
     setOpened(false);
     const data = await axios({
       method: "get",
@@ -200,9 +208,10 @@ function Homepage() {
       headers: { Authorization: localStorage.getItem("SavedToken") },
     });
     setPosts(data.data);
+    setLoading(false);
   };
 
-  return (
+  return !pageLoading ? (
     <>
       <Button variant="outline" onClick={() => navigate(-1)}>
         Go Back
@@ -315,10 +324,28 @@ function Homepage() {
           lg={7}
           style={{ display: "flex", flexDirection: "column", width: "100%" }}
         >
-          {posts?.map((item, id) =>
-            item.creator.email === email ? null : (
-              <CustomDiv key={id} type={1} item={item} />
+          {!loading ? (
+            posts?.length > 0 ? (
+              posts?.map((item, id) =>
+                item.creator.email === email ? null : (
+                  <CustomDiv key={id} type={1} item={item} />
+                )
+              )
+            ) : (
+              <BlankSVG
+                width={"50%"}
+                height={"50%"}
+                style={{
+                  alignSelf: "center",
+                  marginTop: "50%",
+                  transform: "translateY(-50%)",
+                }}
+              />
             )
+          ) : (
+            <Center style={{ width: "100%", height: "100%" }}>
+              <Loader />
+            </Center>
           )}
         </Grid.Col>
         <Grid.Col lg={1} />
@@ -400,6 +427,10 @@ function Homepage() {
         </div>
       </Modal>
     </>
+  ) : (
+    <Center style={{ width: "100%", height: "100%" }}>
+      <Loader />
+    </Center>
   );
 }
 

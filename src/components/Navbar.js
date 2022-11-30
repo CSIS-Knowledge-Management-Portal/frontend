@@ -86,6 +86,7 @@ function Navbar({ loggedIn, setLoggedIn }) {
   };
 
   const Logout = () => {
+    navigate("/");
     localStorage.removeItem("SavedToken");
     setLoggedIn(false);
     googleLogout();

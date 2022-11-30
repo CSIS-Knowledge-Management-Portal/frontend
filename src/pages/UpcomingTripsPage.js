@@ -1,8 +1,9 @@
-import { Text, createStyles, Button } from "@mantine/core";
+import { Text, createStyles, Button, Center, Loader } from "@mantine/core";
 import axios from "axios";
 import React from "react";
 import { useNavigate } from "react-router";
 import CustomDiv from "../components/CustomDiv";
+import { ReactComponent as BlankSVG } from "../assets/undraw_nothing.svg";
 
 const useStyles = createStyles((theme) => ({
   Title: {
@@ -88,6 +89,7 @@ function UpcomingTripsPage() {
   const { classes } = useStyles();
   const [upcomingPosts, setUpcomingPosts] = React.useState(null);
   const [email, setEmail] = React.useState(null);
+  const [pageLoading, setPageLoading] = React.useState(true);
 
   let navigate = useNavigate();
 
@@ -112,18 +114,38 @@ function UpcomingTripsPage() {
     User();
   }, []);
 
-  return (
+  if (pageLoading && upcomingPosts && email) {
+    setPageLoading(false);
+  }
+
+  return !pageLoading ? (
     <>
       <Button variant="subtle" onClick={() => navigate(-1)}>
         Go Back
       </Button>
       <div className={classes.wrapper}>
         <Text className={classes.pageTitle}>Upcoming Trips</Text>
-        {upcomingPosts?.map((item, id) => (
-          <CustomDiv key={id} type={7} item={item} email={email} />
-        ))}
+        {upcomingPosts?.length > 0 ? (
+          upcomingPosts?.map((item, id) => (
+            <CustomDiv key={id} type={7} item={item} email={email} />
+          ))
+        ) : (
+          <BlankSVG
+            width={"40%"}
+            height={"40%"}
+            style={{
+              alignSelf: "center",
+              marginTop: "40%",
+              transform: "translateY(-50%)",
+            }}
+          />
+        )}
       </div>
     </>
+  ) : (
+    <Center style={{ width: "100%", height: "100%" }}>
+      <Loader />
+    </Center>
   );
 }
 

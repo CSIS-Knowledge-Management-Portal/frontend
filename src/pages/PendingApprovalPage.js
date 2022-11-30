@@ -1,9 +1,17 @@
-import { Text, createStyles, Button, Tabs } from "@mantine/core";
+import {
+  Text,
+  createStyles,
+  Button,
+  Tabs,
+  Center,
+  Loader,
+} from "@mantine/core";
 import React from "react";
 import CustomDiv from "../components/CustomDiv";
 import { useMediaQuery } from "@mantine/hooks";
 import { useNavigate } from "react-router";
 import axios from "axios";
+import { ReactComponent as BlankSVG } from "../assets/undraw_nothing.svg";
 
 const useStyles = createStyles((theme) => ({
   pageTitle: {
@@ -52,6 +60,7 @@ function PendingApprovalPage() {
 
   const [sent, setSent] = React.useState();
   const [received, setReceived] = React.useState();
+  const [pageLoading, setPageLoading] = React.useState(true);
 
   React.useEffect(() => {
     const Sent = async () => {
@@ -77,9 +86,11 @@ function PendingApprovalPage() {
     Received();
   }, []);
 
-  console.log(received);
+  if (pageLoading && received && sent) {
+    setPageLoading(false);
+  }
 
-  return (
+  return !pageLoading ? (
     <>
       <Button variant="subtle" onClick={() => navigate(-1)}>
         Go Back
@@ -99,19 +110,49 @@ function PendingApprovalPage() {
           </Tabs.List>
 
           <Tabs.Panel value="sent" pl="xl">
-            {sent?.map((item, id) => (
-              <CustomDiv key={id} type={5} item={item} />
-            ))}
+            {sent?.length > 0 ? (
+              sent?.map((item, id) => (
+                <CustomDiv key={id} type={5} item={item} />
+              ))
+            ) : (
+              <BlankSVG
+                width={"40%"}
+                height={"40%"}
+                style={{
+                  alignSelf: "center",
+                  marginTop: "40%",
+                  marginLeft: "50%",
+                  transform: "translate(-50%, -50%)",
+                }}
+              />
+            )}
           </Tabs.Panel>
 
           <Tabs.Panel value="recieved" pl="xl">
-            {received?.map((item, id) => (
-              <CustomDiv type={6} key={id} item={item} />
-            ))}
+            {received?.length > 0 ? (
+              received?.map((item, id) => (
+                <CustomDiv type={6} key={id} item={item} />
+              ))
+            ) : (
+              <BlankSVG
+                width={"40%"}
+                height={"40%"}
+                style={{
+                  alignSelf: "center",
+                  marginTop: "40%",
+                  marginLeft: "50%",
+                  transform: "translate(-50%, -50%)",
+                }}
+              />
+            )}
           </Tabs.Panel>
         </Tabs>
       </div>
     </>
+  ) : (
+    <Center style={{ width: "100%", height: "100%" }}>
+      <Loader />
+    </Center>
   );
 }
 

@@ -16,6 +16,8 @@ import RequestApprovalPage from "../pages/RequestApprovalPage";
 import TripDetail from "../pages/TripDetail";
 import UpcomingTripsPage from "../pages/UpcomingTripsPage";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import Page404 from "../pages/Page404";
+import Footer from "../components/Footer";
 
 function Navigation() {
   const [loggedIn, setLoggedIn] = React.useState(
@@ -35,12 +37,12 @@ function Navigation() {
               <Route path="/landing" element={<LandingPage />} />
               <Route path="/posts" element={<Homepage />} />
               <Route path="/create-post" element={<CreatePostPage />} />
-              <Route path="choose-vendor" element={<ChooseVendorPage />} />
-              <Route path="my-account" element={<MyAccountPage />} />
-              <Route path="past-trips" element={<PastTripsPage />} />
-              <Route path="upcoming-trips" element={<UpcomingTripsPage />} />
+              <Route path="/choose-vendor" element={<ChooseVendorPage />} />
+              <Route path="/my-account" element={<MyAccountPage />} />
+              <Route path="/past-trips" element={<PastTripsPage />} />
+              <Route path="/upcoming-trips" element={<UpcomingTripsPage />} />
               <Route
-                path="pending-approval"
+                path="/pending-approval"
                 element={<PendingApprovalPage />}
               />
               <Route
@@ -50,7 +52,7 @@ function Navigation() {
               <Route path="/post-details" element={<TripDetail />}>
                 <Route path="/post-details:id" element={<TripDetail />} />
               </Route>
-              <Route path="*" element={<Navigate replace to="/" />} />
+              <Route path="*" element={<Page404 />} />
             </Routes>
           </Container>
         ) : (
@@ -80,11 +82,12 @@ function Navigation() {
                 }
               />
             </Route>
-            <Route path="*" element={<Navigate replace to="/" />} />
+            <Route path="*" element={<Page404 />} />
           </Routes>
         )}
 
         <CreatePostButton />
+        <Footer />
       </BrowserRouter>
     </GoogleOAuthProvider>
   );

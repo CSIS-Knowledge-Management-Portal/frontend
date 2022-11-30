@@ -4,6 +4,7 @@ import {
   Button,
   Card,
   CardSection,
+  Center,
   Collapse,
   createStyles,
   Dialog,
@@ -13,6 +14,7 @@ import { IconCheck, IconEdit, IconX, IconTrash } from "@tabler/icons";
 import { useNavigate } from "react-router";
 import dayjs from "dayjs";
 import axios from "axios";
+import { ReactComponent as NothingSVG } from "../assets/undraw_no_data.svg";
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -149,7 +151,7 @@ const useStyles = createStyles((theme) => ({
   },
 
   itemList: {
-    minHeight: 100,
+    minHeight: 193,
     maxHeight: window.innerHeight / 3,
     overflow: "hidden",
     overflowY: "scroll",
@@ -158,6 +160,7 @@ const useStyles = createStyles((theme) => ({
     [`@media (max-width: ${theme.breakpoints.xl}px)`]: {
       paddingLeft: 16,
       paddingRight: 16,
+      minHeight: 150,
     },
     [`@media (max-width: ${theme.breakpoints.lg}px)`]: {
       paddingLeft: 14,
@@ -254,7 +257,7 @@ export default function CustomDiv({ type, item, email }) {
       url: `${process.env.REACT_APP_ROOT_URL}/api/request/new`,
       headers: { Authorization: localStorage.getItem("SavedToken") },
       data: {
-        trip_link: `http://localhost:3000/post/${item.id}`,
+        trip_link: `http://localhost:3000/post-details/${item.id}`,
         trip_id: item.id,
         requestor: user?.email,
         creator: item.creator?.email,
@@ -438,84 +441,90 @@ export default function CustomDiv({ type, item, email }) {
             </Text>
           </CardSection>
           <div className={classes.itemList}>
-            {received?.map((item, id) => (
-              <CardSection
-                key={id}
-                withBorder
-                className={classes.Textbox}
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  transitionDuration: "3s",
-                  display: disabled
-                    ? setTimeout(() => {
-                        return "none";
-                      }, 2000)
-                    : "flex",
-                }}
-              >
-                <div>
-                  <div className={classes.text}>
-                    <Text c="dimmed">From: </Text>
-                    <Text>{item.source}</Text>
-                  </div>
-                  <div className={classes.text}>
-                    <Text c="dimmed">To: </Text>
-                    <Text>{item.destination}</Text>
-                  </div>
-                  <div className={classes.text}>
-                    <Text c="dimmed">Date: </Text>
-                    <Text>{item.departure_date}</Text>
-                  </div>
-                </div>
-                <div
+            {received?.length > 0 ? (
+              received?.map((item, id) => (
+                <CardSection
+                  key={id}
+                  withBorder
+                  className={classes.Textbox}
                   style={{
                     display: "flex",
                     flexDirection: "row",
+                    justifyContent: "space-between",
                     alignItems: "center",
+                    transitionDuration: "3s",
+                    display: disabled
+                      ? setTimeout(() => {
+                          return "none";
+                        }, 2000)
+                      : "flex",
                   }}
                 >
-                  <Button
-                    leftIcon={<IconCheck />}
-                    variant="outline"
-                    color="green"
-                    classNames={{
-                      root: classes.roundedButton,
-                    }}
-                    styles={(theme) => ({
-                      root: {
-                        transitionDuration: "0.2s",
-                        background: disabled ? "green" : null,
-                        "&:hover": {
-                          color: theme.fn.lighten("#00FF47", 0.05),
-                          borderColor: theme.fn.lighten("#00FF47", 0.05),
-                        },
-                      },
-                    })}
-                    loading={loaderAccept}
-                    disabled={disabled}
-                    onClick={() => Accept(item)}
-                  >
-                    Accept
-                  </Button>
-                  <ActionIcon
-                    variant="outline"
+                  <div>
+                    <div className={classes.text}>
+                      <Text c="dimmed">From: </Text>
+                      <Text>{item.source}</Text>
+                    </div>
+                    <div className={classes.text}>
+                      <Text c="dimmed">To: </Text>
+                      <Text>{item.destination}</Text>
+                    </div>
+                    <div className={classes.text}>
+                      <Text c="dimmed">Date: </Text>
+                      <Text>{item.departure_date}</Text>
+                    </div>
+                  </div>
+                  <div
                     style={{
-                      color: "red",
-                      borderColor: "red",
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
                     }}
-                    classNames={{ root: classes.roundedButton }}
-                    onClick={() => Decline(item)}
-                    loading={loaderReject}
-                    disabled={disabled}
                   >
-                    <IconX size={22} />
-                  </ActionIcon>
-                </div>
-              </CardSection>
-            ))}
+                    <Button
+                      leftIcon={<IconCheck />}
+                      variant="outline"
+                      color="green"
+                      classNames={{
+                        root: classes.roundedButton,
+                      }}
+                      styles={(theme) => ({
+                        root: {
+                          transitionDuration: "0.2s",
+                          background: disabled ? "green" : null,
+                          "&:hover": {
+                            color: theme.fn.lighten("#00FF47", 0.05),
+                            borderColor: theme.fn.lighten("#00FF47", 0.05),
+                          },
+                        },
+                      })}
+                      loading={loaderAccept}
+                      disabled={disabled}
+                      onClick={() => Accept(item)}
+                    >
+                      Accept
+                    </Button>
+                    <ActionIcon
+                      variant="outline"
+                      style={{
+                        color: "red",
+                        borderColor: "red",
+                      }}
+                      classNames={{ root: classes.roundedButton }}
+                      onClick={() => Decline(item)}
+                      loading={loaderReject}
+                      disabled={disabled}
+                    >
+                      <IconX size={22} />
+                    </ActionIcon>
+                  </div>
+                </CardSection>
+              ))
+            ) : (
+              <Center style={{ width: "100%", height: "100%" }}>
+                <NothingSVG />
+              </Center>
+            )}
           </div>
         </Card>
       );
@@ -533,33 +542,34 @@ export default function CustomDiv({ type, item, email }) {
             </Text>
           </CardSection>
           <div className={classes.itemList}>
-            {upcomingPosts?.map((item, id) => (
-              <CardSection
-                key={id}
-                withBorder
-                className={classes.Textbox}
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <div>
-                  <div className={classes.text}>
-                    <Text c="dimmed">From: </Text>
-                    <Text>{item.source}</Text>
+            {upcomingPosts?.length > 0 ? (
+              upcomingPosts?.map((item, id) => (
+                <CardSection
+                  key={id}
+                  withBorder
+                  className={classes.Textbox}
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <div>
+                    <div className={classes.text}>
+                      <Text c="dimmed">From: </Text>
+                      <Text>{item.source}</Text>
+                    </div>
+                    <div className={classes.text}>
+                      <Text c="dimmed">To: </Text>
+                      <Text>{item.destination}</Text>
+                    </div>
+                    <div className={classes.text}>
+                      <Text c="dimmed">Date: </Text>
+                      <Text>{item.departure_date}</Text>
+                    </div>
                   </div>
-                  <div className={classes.text}>
-                    <Text c="dimmed">To: </Text>
-                    <Text>{item.destination}</Text>
-                  </div>
-                  <div className={classes.text}>
-                    <Text c="dimmed">Date: </Text>
-                    <Text>{item.departure_date}</Text>
-                  </div>
-                </div>
-                {/* <Button
+                  {/* <Button
                   leftIcon={<IconCheck />}
                   variant="outline"
                   color="blue"
@@ -578,8 +588,13 @@ export default function CustomDiv({ type, item, email }) {
                 >
                   Add to Calendar
                 </Button> */}
-              </CardSection>
-            ))}
+                </CardSection>
+              ))
+            ) : (
+              <Center style={{ width: "100%", height: "100%" }}>
+                <NothingSVG width="20px" />
+              </Center>
+            )}
           </div>
         </Card>
       );
@@ -834,34 +849,40 @@ export default function CustomDiv({ type, item, email }) {
             </Text>
           </CardSection>
           <div className={classes.itemList}>
-            {pastPosts?.map((item, id) => (
-              <CardSection
-                key={id}
-                withBorder
-                className={classes.Textbox}
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <div>
-                  <div className={classes.text}>
-                    <Text c="dimmed">From: </Text>
-                    <Text>{item.source}</Text>
+            {pastPosts?.length > 0 ? (
+              pastPosts?.map((item, id) => (
+                <CardSection
+                  key={id}
+                  withBorder
+                  className={classes.Textbox}
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <div>
+                    <div className={classes.text}>
+                      <Text c="dimmed">From: </Text>
+                      <Text>{item.source}</Text>
+                    </div>
+                    <div className={classes.text}>
+                      <Text c="dimmed">To: </Text>
+                      <Text>{item.destination}</Text>
+                    </div>
+                    <div className={classes.text}>
+                      <Text c="dimmed">Date: </Text>
+                      <Text>{item.departure_date}</Text>
+                    </div>
                   </div>
-                  <div className={classes.text}>
-                    <Text c="dimmed">To: </Text>
-                    <Text>{item.destination}</Text>
-                  </div>
-                  <div className={classes.text}>
-                    <Text c="dimmed">Date: </Text>
-                    <Text>{item.departure_date}</Text>
-                  </div>
-                </div>
-              </CardSection>
-            ))}
+                </CardSection>
+              ))
+            ) : (
+              <Center style={{ width: "100%", height: "100%" }}>
+                <NothingSVG />
+              </Center>
+            )}
           </div>
         </Card>
       );
@@ -879,67 +900,73 @@ export default function CustomDiv({ type, item, email }) {
             </Text>
           </CardSection>
           <div className={classes.itemList}>
-            {sent?.map((item, id) => (
-              <CardSection
-                key={id}
-                withBorder
-                className={classes.Textbox}
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <div>
-                  <div className={classes.text}>
-                    <Text c="dimmed">From: </Text>
-                    <Text>{item.source}</Text>
-                  </div>
-                  <div className={classes.text}>
-                    <Text c="dimmed">To: </Text>
-                    <Text>{item.destination}</Text>
-                  </div>
-                  <div className={classes.text}>
-                    <Text c="dimmed">Date: </Text>
-                    <Text>{item.departure_date}</Text>
-                  </div>
-                </div>
-                <div
+            {sent?.length > 0 ? (
+              sent?.map((item, id) => (
+                <CardSection
+                  key={id}
+                  withBorder
+                  className={classes.Textbox}
                   style={{
                     display: "flex",
                     flexDirection: "row",
+                    justifyContent: "space-between",
                     alignItems: "center",
                   }}
                 >
-                  <Button
-                    variant="outline"
+                  <div>
+                    <div className={classes.text}>
+                      <Text c="dimmed">From: </Text>
+                      <Text>{item.source}</Text>
+                    </div>
+                    <div className={classes.text}>
+                      <Text c="dimmed">To: </Text>
+                      <Text>{item.destination}</Text>
+                    </div>
+                    <div className={classes.text}>
+                      <Text c="dimmed">Date: </Text>
+                      <Text>{item.departure_date}</Text>
+                    </div>
+                  </div>
+                  <div
                     style={{
-                      marginRight: 0,
-                      cursor: "initial",
-                      color: "white",
-                      background:
-                        item.status === "Unconfirmed"
-                          ? null
-                          : item.status === "Accepted"
-                          ? "green"
-                          : "red",
-                      borderColor:
-                        item.status === "Unconfirmed"
-                          ? null
-                          : item.status === "Accepted"
-                          ? "green"
-                          : "red",
-                    }}
-                    classNames={{
-                      root: classes.roundedButton,
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
                     }}
                   >
-                    {item.status}
-                  </Button>
-                </div>
-              </CardSection>
-            ))}
+                    <Button
+                      variant="outline"
+                      style={{
+                        marginRight: 0,
+                        cursor: "initial",
+                        color: "white",
+                        background:
+                          item.status === "Unconfirmed"
+                            ? null
+                            : item.status === "Accepted"
+                            ? "green"
+                            : "red",
+                        borderColor:
+                          item.status === "Unconfirmed"
+                            ? null
+                            : item.status === "Accepted"
+                            ? "green"
+                            : "red",
+                      }}
+                      classNames={{
+                        root: classes.roundedButton,
+                      }}
+                    >
+                      {item.status}
+                    </Button>
+                  </div>
+                </CardSection>
+              ))
+            ) : (
+              <Center style={{ width: "100%", height: "100%" }}>
+                <NothingSVG />
+              </Center>
+            )}
           </div>
         </Card>
       );

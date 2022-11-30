@@ -7,6 +7,8 @@ import {
   Grid,
   Divider,
   Dialog,
+  Loader,
+  Center,
 } from "@mantine/core";
 import React from "react";
 import { IconLock, IconEdit } from "@tabler/icons";
@@ -133,6 +135,7 @@ function Dashboard() {
   const [phone, setPhone] = React.useState();
   const [error, setError] = React.useState(false);
   const [opened, setOpened] = React.useState(false);
+  const [pageLoading, setPageLoading] = React.useState(true);
   const [upcomingPosts, setUpcomingPosts] = React.useState(null);
 
   const Phone = async () => {
@@ -162,7 +165,6 @@ function Dashboard() {
 
   React.useEffect(() => {
     const User = async () => {
-      console.log("sent");
       const data = await axios.get(`${process.env.REACT_APP_ROOT_URL}/user/`, {
         headers: { Authorization: localStorage.getItem("SavedToken") },
       });
@@ -183,17 +185,21 @@ function Dashboard() {
     UpcomingTrips();
   }, []);
 
+  if (pageLoading && userDetail && phone && upcomingPosts) {
+    setPageLoading(false);
+  }
+
   const ToPast = async () => {
     upcomingPosts?.map((item, id) => {
       if (new Date(item.departure_date) < new Date()) {
         ToPastCall(item.id);
-      } else console.log(item.departure_date, " is greater than ", new Date());
+      }
     });
     // window.location.reload();
   };
 
   const ToPastCall = async (id) => {
-    const data = await axios({
+    await axios({
       method: "post",
       url: `${process.env.REACT_APP_ROOT_URL}/api/trip/done`,
       headers: { Authorization: localStorage.getItem("SavedToken") },
@@ -201,12 +207,11 @@ function Dashboard() {
         trip_id: id,
       },
     });
-    console.log(data.data);
   };
 
   if (upcomingPosts) ToPast();
 
-  return (
+  return !pageLoading ? (
     <>
       <Grid gutter="xl" columns={15}>
         <Grid.Col sm={15} lg={4} className={classes.wrapper}>
@@ -300,6 +305,10 @@ function Dashboard() {
         </Grid.Col>
       </Grid>
     </>
+  ) : (
+    <Center style={{ width: "100%", height: "100%" }}>
+      <Loader />
+    </Center>
   );
 }
 

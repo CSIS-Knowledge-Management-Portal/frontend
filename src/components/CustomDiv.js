@@ -327,8 +327,6 @@ export default function CustomDiv({ type, item, email }) {
     ApprovalSent();
   }, [disabled]);
 
-  console.log("received", received);
-
   switch (type) {
     case 1:
       let match = item?.requests.filter(

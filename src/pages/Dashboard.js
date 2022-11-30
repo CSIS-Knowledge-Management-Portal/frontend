@@ -17,6 +17,7 @@ import { useNavigate } from "react-router";
 import axios from "axios";
 import CustomDiv from "../components/CustomDiv";
 import { useMediaQuery } from "@mantine/hooks";
+import Test from "../utils/calendar";
 
 const useStyles = createStyles((theme) => ({
   Title: {
@@ -141,7 +142,7 @@ function Dashboard() {
   const Phone = async () => {
     if (/^[1-9][0-9]{9}$/.test(phone)) {
       setError(false);
-      const data = await axios({
+      await axios({
         method: "patch",
         url: `${process.env.REACT_APP_ROOT_URL}/user/phone`,
         headers: { Authorization: localStorage.getItem("SavedToken") },
@@ -149,7 +150,7 @@ function Dashboard() {
           phone: phone,
         },
       });
-      console.log(data.data);
+
       setOpened(true);
       setTimeout(() => {
         setOpened(false);
@@ -161,9 +162,9 @@ function Dashboard() {
 
   let navigate = useNavigate();
   const largeScreen = useMediaQuery("(min-width: 1200px)");
-  console.log(userDetail);
 
   React.useEffect(() => {
+    Test();
     const User = async () => {
       const data = await axios.get(`${process.env.REACT_APP_ROOT_URL}/user/`, {
         headers: { Authorization: localStorage.getItem("SavedToken") },

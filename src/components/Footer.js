@@ -7,12 +7,12 @@ function Footer() {
   return (
     <div
       style={{
-        // marginTop: 50,
+        position: "relative",
+        bottom: 0,
         height: 300,
         width: "100%",
         backgroundColor: "black",
         color: "white",
-        position: "relative",
       }}
     >
       <Title
@@ -39,7 +39,7 @@ function Footer() {
           cursor: "default",
         }}
       >
-        Made with <Heart height={20} /> by AARUSH & SHIVANSH
+        Made with <Heart height={30} /> by AARUSH & SHIVANSH
       </Text>
 
       <Center
@@ -80,7 +80,7 @@ function Footer() {
           cursor: "default",
         }}
       >
-        © TravelBPHC 2022
+        © Travel@BPHC 2022
       </Text>
     </div>
   );

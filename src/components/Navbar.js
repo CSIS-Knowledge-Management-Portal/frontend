@@ -4,19 +4,21 @@ import { IconChevronDown, IconLogout } from "@tabler/icons";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { googleLogout } from "@react-oauth/google";
+import { ReactComponent as Logo } from "../assets/travelbphc-logo.svg";
+import { ReactComponent as Logo1 } from "../assets/travelbphc-logo-sm.svg";
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
     padding: 0,
     backgroundColor: theme.colors.customDark[6],
     alignItems: "center",
-    position: "fixed",
+    position: "sticky",
+    top: 0,
     height: 68,
     paddingLeft: 20,
     paddingRight: 20,
     width: window.innerWidth,
     zIndex: 100,
-    top: 0,
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
@@ -101,10 +103,12 @@ function Navbar({ loggedIn, setLoggedIn }) {
       className={classes.wrapper}
       style={{ display: loggedIn ? null : "none" }}
     >
-      <Text onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
+      {/* <Text onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
         TRAVEL@BPHC
-      </Text>
+      </Text> */}
 
+      <Logo height={64} />
+      <Logo1 height={64} />
       <div
         style={{
           display: "flex",

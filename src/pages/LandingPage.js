@@ -95,7 +95,7 @@ function LandingPage({ loggedIn, setLoggedIn }) {
   const { classes } = useStyles();
 
   const Login = async (response) => {
-    console.log(response.credential);
+    console.log("response", response);
     var xhr = new XMLHttpRequest();
     xhr.open("POST", `${process.env.REACT_APP_ROOT_URL}/user/auth`);
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");

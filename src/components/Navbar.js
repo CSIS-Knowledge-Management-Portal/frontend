@@ -4,12 +4,10 @@ import { IconChevronDown, IconLogout } from "@tabler/icons";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { googleLogout } from "@react-oauth/google";
-import { ReactComponent as Logo } from "../assets/travelbphc-logo.svg";
-import { ReactComponent as Logo1 } from "../assets/travelbphc-logo-sm.svg";
+import { ReactComponent as Logo } from "../assets/travelbphc-logo-sm.svg";
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
-    padding: 0,
     backgroundColor: theme.colors.customDark[6],
     alignItems: "center",
     position: "sticky",
@@ -35,12 +33,23 @@ const useStyles = createStyles((theme) => ({
     [`@media (max-width: ${theme.breakpoints.md}px)`]: {
       paddingLeft: 10,
       paddingRight: 10,
-      height: 44,
+      height: 48,
     },
   },
 
   logo: {
-    textAlign: "center",
+    height: 64,
+    width: "auto",
+
+    [`@media (max-width: ${theme.breakpoints.xl}px)`]: {
+      height: 64 * 0.85,
+    },
+    [`@media (max-width: ${theme.breakpoints.lg}px)`]: {
+      height: 64 * 0.7,
+    },
+    [`@media (max-width: ${theme.breakpoints.md}px)`]: {
+      height: 40,
+    },
   },
 
   avatarContainer: {
@@ -52,8 +61,9 @@ const useStyles = createStyles((theme) => ({
   },
 
   avatar: {
-    height: 50,
-    width: 50,
+    height: 45,
+    width: 45,
+    marginRight: 10,
     borderRadius: 999,
     [`@media (max-width: ${theme.breakpoints.xl}px)`]: {
       height: 50 * 0.85,
@@ -66,26 +76,14 @@ const useStyles = createStyles((theme) => ({
     [`@media (max-width: ${theme.breakpoints.md}px)`]: {
       height: 30,
       width: 30,
+      marginRight: 5,
     },
   },
 }));
 
 function Navbar({ loggedIn, setLoggedIn }) {
   const { classes } = useStyles();
-
-  const Login = async (response) => {
-    console.log(response.tokenId);
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", `${process.env.REACT_APP_ROOT_URL}/user/auth`);
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    xhr.send("credential=" + response.tokenId);
-    xhr.onload = function () {
-      let data = JSON.parse(xhr.responseText);
-      console.log("Signed in as: ", data);
-      localStorage.setItem("SavedToken", "Bearer " + data.token);
-      setLoggedIn(true);
-    };
-  };
+  const [user, setUser] = React.useState();
 
   const Logout = () => {
     navigate("/");
@@ -96,19 +94,26 @@ function Navbar({ loggedIn, setLoggedIn }) {
 
   let navigate = useNavigate();
 
-  React.useEffect(() => {}, [loggedIn]);
+  React.useEffect(() => {
+    const User = async () => {
+      const data = await axios.get(`${process.env.REACT_APP_ROOT_URL}/user/`, {
+        headers: { Authorization: localStorage.getItem("SavedToken") },
+      });
+      setUser(data.data);
+    };
+    User();
+  }, [loggedIn]);
 
   return (
     <div
       className={classes.wrapper}
       style={{ display: loggedIn ? null : "none" }}
     >
-      {/* <Text onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
-        TRAVEL@BPHC
-      </Text> */}
-
-      <Logo height={64} />
-      <Logo1 height={64} />
+      <Logo
+        className={classes.logo}
+        onClick={() => navigate("/")}
+        style={{ cursor: "pointer" }}
+      />
       <div
         style={{
           display: "flex",
@@ -117,16 +122,20 @@ function Navbar({ loggedIn, setLoggedIn }) {
           gap: 10,
         }}
       >
-        <Link to="/">
+        {/* <Link to="/">
           <Button variant="subtle">Dashboard</Button>
         </Link>
         <Link to="/create-post">
           <Button variant="subtle">Create Post</Button>
-        </Link>
+        </Link> */}
         <Menu shadow="md" width={200} position="top-end">
           <Menu.Target className={classes.avatarContainer}>
             <div>
-              <Avatar variant="filled" className={classes.avatar} />
+              <Avatar
+                variant="filled"
+                className={classes.avatar}
+                src={user?.pfp}
+              />
               <IconChevronDown size={14} />
             </div>
           </Menu.Target>

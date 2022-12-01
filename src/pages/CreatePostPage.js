@@ -204,6 +204,19 @@ function CreatePostPage() {
     navigate("/upcoming-trips");
   };
 
+  // function getLocation() {
+  //   if (navigator.geolocation) {
+  //     navigator.geolocation.getCurrentPosition(showposition);
+  //   } else {
+  //     console.log("Geolocation is not supported by this browser.");
+  //   }
+  // }
+
+  // function showposition(postion) {
+  //   console.log("latitude:", postion.coords.latitude);
+  //   console.log("longitude:", postion.coords.longitude);
+  // }
+
   return (
     <>
       <Button variant="subtle" onClick={() => navigate(-1)}>
@@ -226,7 +239,7 @@ function CreatePostPage() {
                 borderLeftColor: "white",
                 borderWidth: 1,
               }}
-              onClick={() => console.log("hello")}
+              // onClick={() => console.log("hello")}
             >
               <IconMapPin size={20} />
             </ActionIcon>
@@ -256,7 +269,7 @@ function CreatePostPage() {
                 borderLeftColor: "white",
                 borderWidth: 1,
               }}
-              onClick={() => console.log("hello")}
+              // onClick={() => getLocation()}
             >
               <IconMapPin size={20} />
             </ActionIcon>

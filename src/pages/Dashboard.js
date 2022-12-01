@@ -17,7 +17,6 @@ import { useNavigate } from "react-router";
 import axios from "axios";
 import CustomDiv from "../components/CustomDiv";
 import { useMediaQuery } from "@mantine/hooks";
-import Test from "../utils/calendar";
 
 const useStyles = createStyles((theme) => ({
   Title: {
@@ -164,7 +163,6 @@ function Dashboard() {
   const largeScreen = useMediaQuery("(min-width: 1200px)");
 
   React.useEffect(() => {
-    Test();
     const User = async () => {
       const data = await axios.get(`${process.env.REACT_APP_ROOT_URL}/user/`, {
         headers: { Authorization: localStorage.getItem("SavedToken") },

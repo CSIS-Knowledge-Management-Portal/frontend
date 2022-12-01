@@ -158,10 +158,9 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-function Dashboard() {
+function Dashboard({ userDetail }) {
   const { classes } = useStyles();
-  const [userDetail, setUserDetail] = React.useState();
-  const [phone, setPhone] = React.useState();
+  const [phone, setPhone] = React.useState(userDetail?.phone);
   const [error, setError] = React.useState(false);
   const [opened, setOpened] = React.useState(false);
   const [pageLoading, setPageLoading] = React.useState(true);
@@ -189,16 +188,8 @@ function Dashboard() {
     }
   };
 
+  console.log("got details", userDetail);
   React.useEffect(() => {
-    const User = async () => {
-      const data = await axios.get(`${process.env.REACT_APP_ROOT_URL}/user/`, {
-        headers: { Authorization: localStorage.getItem("SavedToken") },
-      });
-      setUserDetail(data.data);
-      setPhone(data.data.phone);
-    };
-    User();
-
     const UpcomingTrips = async () => {
       const data = await axios.get(
         `${process.env.REACT_APP_ROOT_URL}/api/trip/upcoming`,
@@ -211,7 +202,7 @@ function Dashboard() {
     UpcomingTrips();
   }, []);
 
-  if (pageLoading && userDetail && phone && upcomingPosts) {
+  if (pageLoading && upcomingPosts) {
     setPageLoading(false);
   }
 

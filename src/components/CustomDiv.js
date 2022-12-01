@@ -258,7 +258,7 @@ export default function CustomDiv({ type, item, email }) {
       url: `${process.env.REACT_APP_ROOT_URL}/api/request/new`,
       headers: { Authorization: localStorage.getItem("SavedToken") },
       data: {
-        trip_link: `http://localhost:3000/post-details/${item.id}`,
+        trip_link: `${process.env.REACT_APP_ROOT_URL}/post-details/${item.id}`,
         trip_id: item.id,
         requestor: user?.email,
         creator: item.creator?.email,

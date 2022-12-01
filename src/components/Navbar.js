@@ -86,7 +86,7 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-function Navbar({ loggedIn, setLoggedIn }) {
+function Navbar({ loggedIn, setLoggedIn, setUserDetail }) {
   const { classes } = useStyles();
   const [user, setUser] = React.useState();
 
@@ -105,6 +105,7 @@ function Navbar({ loggedIn, setLoggedIn }) {
         headers: { Authorization: localStorage.getItem("SavedToken") },
       });
       setUser(data.data);
+      setUserDetail(data.data);
     };
     User();
   }, [loggedIn]);

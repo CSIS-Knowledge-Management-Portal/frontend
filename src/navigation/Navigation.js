@@ -24,16 +24,22 @@ function Navigation() {
     localStorage.getItem("SavedToken") ? true : false
   );
 
+  const [userDetail, setUserDetail] = React.useState(null);
+
   React.useEffect(() => {}, [loggedIn]);
   return (
     <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_KEY}>
       <BrowserRouter>
-        <Navbar loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
+        <Navbar
+          loggedIn={loggedIn}
+          setLoggedIn={setLoggedIn}
+          setUserDetail={setUserDetail}
+        />
 
         {loggedIn ? (
           <Container>
             <Routes>
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/" element={<Dashboard userDetail={userDetail} />} />
               <Route path="/landing" element={<LandingPage />} />
               <Route path="/posts" element={<Homepage />} />
               <Route path="/create-post" element={<CreatePostPage />} />

@@ -52,7 +52,8 @@ const useStyles = createStyles((theme) => ({
     },
     [`@media (max-width: ${theme.breakpoints.xs}px)`]: {
       // width: "90%",
-      marginTop: 5,
+      marginTop: 15,
+      marginBottom: 10,
       marginLeft: "auto",
       marginRight: "auto",
     },

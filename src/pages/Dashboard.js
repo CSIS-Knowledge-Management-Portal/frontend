@@ -9,9 +9,15 @@ import {
   Dialog,
   Loader,
   Center,
+  Collapse,
 } from "@mantine/core";
 import React from "react";
-import { IconLock, IconEdit } from "@tabler/icons";
+import {
+  IconLock,
+  IconEdit,
+  IconChevronDown,
+  IconChevronUp,
+} from "@tabler/icons";
 import { useForm } from "@mantine/form";
 import { useNavigate } from "react-router";
 import axios from "axios";
@@ -30,6 +36,7 @@ const useStyles = createStyles((theme) => ({
     },
     [`@media (max-width: ${theme.breakpoints.md}px)`]: {
       fontSize: 20,
+      textAlign: "left",
     },
   },
   pageTitle: {
@@ -52,7 +59,6 @@ const useStyles = createStyles((theme) => ({
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
-    width: "40%",
     [`@media (max-width: ${theme.breakpoints.xl}px)`]: {
       width: "50%",
     },
@@ -60,7 +66,29 @@ const useStyles = createStyles((theme) => ({
       width: "65%",
     },
     [`@media (max-width: ${theme.breakpoints.md}px)`]: {
-      width: "85%",
+      width: "95%",
+    },
+  },
+
+  account: {
+    [`@media (max-width: ${theme.breakpoints.md}px)`]: {
+      marginLeft: 0,
+      marginRight: "auto",
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "center",
+      width: "100%",
+      justifyContent: "space-between",
+    },
+  },
+
+  accountButton: {
+    display: "none",
+    [`@media (max-width: ${theme.breakpoints.md}px)`]: {
+      display: "block",
+      marginRight: 0,
+      marginLeft: "auto",
+      fontSize: 14,
     },
   },
 
@@ -84,13 +112,14 @@ const useStyles = createStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
+
     [`@media (max-width: ${theme.breakpoints.lg}px)`]: {
       width: "80%",
       marginRight: 0,
       marginLeft: "auto",
     },
     [`@media (max-width: ${theme.breakpoints.sm}px)`]: {
-      width: "80%",
+      width: "100%",
       marginLeft: "auto",
       marginRight: "auto",
     },
@@ -105,8 +134,8 @@ const useStyles = createStyles((theme) => ({
 
   button: {
     width: "50%",
-    marginLeft: "auto",
-    marginRight: "auto",
+    marginLeft: "50%",
+    transform: "translateX(-50%)",
     height: 70,
     borderRadius: 20,
     marginTop: 30,
@@ -137,6 +166,7 @@ function Dashboard() {
   const [opened, setOpened] = React.useState(false);
   const [pageLoading, setPageLoading] = React.useState(true);
   const [upcomingPosts, setUpcomingPosts] = React.useState(null);
+  const [accountToggle, setAccountToggle] = React.useState(false);
 
   const Phone = async () => {
     if (/^[1-9][0-9]{9}$/.test(phone)) {
@@ -158,9 +188,6 @@ function Dashboard() {
       setError(true);
     }
   };
-
-  let navigate = useNavigate();
-  const largeScreen = useMediaQuery("(min-width: 1200px)");
 
   React.useEffect(() => {
     const User = async () => {
@@ -210,22 +237,42 @@ function Dashboard() {
 
   if (upcomingPosts) ToPast();
 
+  const largeScreen = useMediaQuery("(min-width: 800px)");
+
   return !pageLoading ? (
     <>
       <Grid gutter="xl" columns={15}>
         <Grid.Col sm={15} lg={4} className={classes.wrapper}>
-          <div style={{ display: "inline-block" }}>
+          <div className={classes.account}>
+            <div style={{ display: "inline-block" }}>
+              <Text
+                className={classes.Title}
+                variant="gradient"
+                gradient={{ from: "blue.5", to: "pink.7", deg: 0 }}
+              >
+                Hi, {userDetail?.name}!
+              </Text>
+            </div>
             <Text
-              className={classes.Title}
-              variant="gradient"
-              gradient={{ from: "blue.5", to: "pink.7", deg: 0 }}
+              className={classes.accountButton}
+              c="dimmed"
+              onClick={() => setAccountToggle(!accountToggle)}
             >
-              Hi, {userDetail?.name}!
+              Account info{" "}
+              {!accountToggle ? (
+                <IconChevronDown size={14} />
+              ) : (
+                <IconChevronUp size={14} />
+              )}
             </Text>
           </div>
-          <div className={classes.profile}>
+
+          <Collapse
+            in={largeScreen ? true : accountToggle}
+            className={classes.profile}
+          >
             <Avatar className={classes.avatar} src={userDetail?.pfp} />
-            <div style={{ width: "90%" }}>
+            <div style={{ width: "100%" }}>
               <TextInput
                 className={classes.form}
                 label="Name"
@@ -272,7 +319,7 @@ function Dashboard() {
                 </Text>
               </Dialog>
             </div>
-          </div>
+          </Collapse>
         </Grid.Col>
         <Divider
           orientation="vertical"

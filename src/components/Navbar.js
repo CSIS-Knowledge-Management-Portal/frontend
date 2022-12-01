@@ -19,7 +19,7 @@ const useStyles = createStyles((theme) => ({
     zIndex: 100,
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-between",
+    // justifyContent: "flex-end",
     [`@media (max-width: ${theme.breakpoints.xl}px)`]: {
       paddingLeft: 16,
       paddingRight: 16,
@@ -40,6 +40,9 @@ const useStyles = createStyles((theme) => ({
   logo: {
     height: 64,
     width: "auto",
+    position: "absolute",
+    marginLeft: "50%",
+    transform: "translateX(-60%)",
 
     [`@media (max-width: ${theme.breakpoints.xl}px)`]: {
       height: 64 * 0.85,
@@ -58,6 +61,8 @@ const useStyles = createStyles((theme) => ({
     justifyContent: "flex-end",
     alignItems: "center",
     cursor: "pointer",
+    position: "absolute",
+    right: 20,
   },
 
   avatar: {
@@ -142,6 +147,9 @@ function Navbar({ loggedIn, setLoggedIn }) {
 
           <Menu.Dropdown>
             <Menu.Label>Application</Menu.Label>
+            <Link to="/">
+              <Menu.Item>Dashboard</Menu.Item>
+            </Link>
             <Link to="/posts">
               <Menu.Item>All Posts</Menu.Item>
             </Link>

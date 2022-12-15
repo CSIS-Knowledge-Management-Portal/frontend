@@ -18,11 +18,10 @@ import {
   IconChevronDown,
   IconChevronUp,
 } from "@tabler/icons";
-import { useForm } from "@mantine/form";
-import { useNavigate } from "react-router";
 import axios from "axios";
 import CustomDiv from "../components/CustomDiv";
 import { useMediaQuery } from "@mantine/hooks";
+import { UserContext } from "../utils/Context";
 
 const useStyles = createStyles((theme) => ({
   Title: {
@@ -158,13 +157,13 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-function Dashboard({ userDetail }) {
+function Dashboard() {
+  const { userDetail, upcomingTrips } = React.useContext(UserContext);
   const { classes } = useStyles();
   const [phone, setPhone] = React.useState(userDetail?.phone);
   const [error, setError] = React.useState(false);
   const [opened, setOpened] = React.useState(false);
   const [pageLoading, setPageLoading] = React.useState(true);
-  const [upcomingPosts, setUpcomingPosts] = React.useState(null);
   const [accountToggle, setAccountToggle] = React.useState(false);
 
   const Phone = async () => {
@@ -188,45 +187,16 @@ function Dashboard({ userDetail }) {
     }
   };
 
-  console.log("got details", userDetail);
-  React.useEffect(() => {
-    const UpcomingTrips = async () => {
-      const data = await axios.get(
-        `${process.env.REACT_APP_ROOT_URL}/api/trip/upcoming`,
-        {
-          headers: { Authorization: localStorage.getItem("SavedToken") },
-        }
-      );
-      setUpcomingPosts(data.data);
-    };
-    UpcomingTrips();
-  }, []);
+  const pageLoaded = React.useCallback(
+    (response) => {
+      setPageLoading(false);
+    },
+    [pageLoading, upcomingTrips, userDetail]
+  );
 
-  if (pageLoading && upcomingPosts) {
-    setPageLoading(false);
+  if (pageLoading && upcomingTrips && userDetail) {
+    pageLoaded();
   }
-
-  const ToPast = async () => {
-    upcomingPosts?.map((item, id) => {
-      if (new Date(item.departure_date) < new Date()) {
-        ToPastCall(item.id);
-      }
-    });
-    // window.location.reload();
-  };
-
-  const ToPastCall = async (id) => {
-    await axios({
-      method: "post",
-      url: `${process.env.REACT_APP_ROOT_URL}/api/trip/done`,
-      headers: { Authorization: localStorage.getItem("SavedToken") },
-      data: {
-        trip_id: id,
-      },
-    });
-  };
-
-  if (upcomingPosts) ToPast();
 
   const largeScreen = useMediaQuery("(min-width: 800px)");
 
@@ -282,7 +252,7 @@ function Dashboard({ userDetail }) {
               <TextInput
                 label="Phone Number"
                 className={classes.form}
-                value={phone}
+                value={phone || userDetail?.phone}
                 onChange={(event) => setPhone(event.currentTarget.value)}
                 required
                 error={error ? "Invalid Phone" : null}

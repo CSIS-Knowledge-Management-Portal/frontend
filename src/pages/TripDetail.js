@@ -101,7 +101,11 @@ function TripDetail() {
   const { id } = useParams();
 
   React.useEffect(() => {
-    const Post = async () => {
+    getPost();
+  }, []);
+
+  const getPost = React.useCallback(
+    async (response) => {
       const data = await axios.get(
         `${process.env.REACT_APP_ROOT_URL}/api/trip/${id}`,
         {
@@ -109,9 +113,10 @@ function TripDetail() {
         }
       );
       setPost(data.data);
-    };
-    Post();
-  }, []);
+    },
+    [post]
+  );
+
   if (post) {
     navigate("/create-post", {
       state: {

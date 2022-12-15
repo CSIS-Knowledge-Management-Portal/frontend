@@ -15,6 +15,7 @@ import { useNavigate } from "react-router";
 import dayjs from "dayjs";
 import axios from "axios";
 import { ReactComponent as NothingSVG } from "../assets/undraw_no_data.svg";
+import { UserContext } from "../utils/Context";
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -194,13 +195,17 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export default function CustomDiv({ type, item, email }) {
+  const {
+    userDetail,
+    upcomingTrips,
+    pastTrips,
+    sentRequests,
+    recievedRequests,
+    setSentRequests,
+    setRecievedRequests,
+  } = React.useContext(UserContext);
   const { classes } = useStyles();
   const [showDetails, setShowDetails] = React.useState(false);
-  const [pastPosts, setPastPosts] = React.useState(null);
-  const [sent, setSent] = React.useState();
-  const [received, setReceived] = React.useState();
-  const [upcomingPosts, setUpcomingPosts] = React.useState(null);
-  const [user, setUser] = React.useState();
   const [loading1, setLoading1] = React.useState(false);
   const [opened1, setOpened1] = React.useState(false);
   const [disabled1, setDisabled1] = React.useState(false);
@@ -220,6 +225,7 @@ export default function CustomDiv({ type, item, email }) {
       headers: { Authorization: localStorage.getItem("SavedToken") },
     });
     if (data.data) {
+      getRecievedRequests();
       setLoaderAccept(false);
       setDisabled(true);
     }
@@ -235,6 +241,7 @@ export default function CustomDiv({ type, item, email }) {
       headers: { Authorization: localStorage.getItem("SavedToken") },
     });
     if (data.data) {
+      getRecievedRequests();
       setLoaderReject(false);
       setDisabled(true);
     }
@@ -260,11 +267,12 @@ export default function CustomDiv({ type, item, email }) {
       data: {
         trip_link: `${process.env.REACT_APP_ROOT_URL}/post-details/${item.id}`,
         trip_id: item.id,
-        requestor: user?.email,
+        requestor: userDetail?.email,
         creator: item.creator?.email,
       },
     });
     if (data.data) {
+      getSentRequests();
       setLoading1(false);
       setDisabled1(true);
       setOpened1(true);
@@ -274,64 +282,38 @@ export default function CustomDiv({ type, item, email }) {
     }
   };
 
-  React.useEffect(() => {
-    const User = async () => {
-      const data = await axios.get(`${process.env.REACT_APP_ROOT_URL}/user/`, {
-        headers: { Authorization: localStorage.getItem("SavedToken") },
-      });
-      setUser(data.data);
-    };
-    User();
-
-    const UpcomingTrips = async () => {
-      const data = await axios.get(
-        `${process.env.REACT_APP_ROOT_URL}/api/trip/upcoming`,
-        {
-          headers: { Authorization: localStorage.getItem("SavedToken") },
-        }
-      );
-      setUpcomingPosts(data.data.slice(0, 2));
-    };
-    UpcomingTrips();
-
-    const PastTrips = async () => {
-      const data = await axios.get(
-        `${process.env.REACT_APP_ROOT_URL}/api/trip/past`,
-        {
-          headers: { Authorization: localStorage.getItem("SavedToken") },
-        }
-      );
-      setPastPosts(data.data.slice(0, 2));
-    };
-    PastTrips();
-
-    const ApprovalRecieved = async () => {
-      const data = await axios.get(
-        `${process.env.REACT_APP_ROOT_URL}/api/request/all-received`,
-        {
-          headers: { Authorization: localStorage.getItem("SavedToken") },
-        }
-      );
-      setReceived(data.data.slice(0, 2));
-    };
-    ApprovalRecieved();
-
-    const ApprovalSent = async () => {
+  const getSentRequests = React.useCallback(
+    async (response) => {
       const data = await axios.get(
         `${process.env.REACT_APP_ROOT_URL}/api/request/all-sent`,
         {
           headers: { Authorization: localStorage.getItem("SavedToken") },
         }
       );
-      setSent(data.data.slice(0, 2));
-    };
-    ApprovalSent();
-  }, [disabled]);
+      setSentRequests(data.data);
+    },
+    [sentRequests]
+  );
+
+  const getRecievedRequests = React.useCallback(
+    async (response) => {
+      const data = await axios.get(
+        `${process.env.REACT_APP_ROOT_URL}/api/request/all-received`,
+        {
+          headers: { Authorization: localStorage.getItem("SavedToken") },
+        }
+      );
+      setRecievedRequests(data.data);
+    },
+    [recievedRequests]
+  );
+
+  React.useEffect(() => {}, [disabled]);
 
   switch (type) {
     case 1:
       let match = item?.requests.filter(
-        (item) => item?.requestor_email === user?.email
+        (item) => item?.requestor_email === userDetail?.email
       );
       match = match[match?.length - 1];
       return (
@@ -440,8 +422,8 @@ export default function CustomDiv({ type, item, email }) {
             </Text>
           </CardSection>
           <div className={classes.itemList}>
-            {received?.length > 0 ? (
-              received?.map((item, id) => (
+            {recievedRequests?.length > 0 ? (
+              recievedRequests.slice(0, 2)?.map((item, id) => (
                 <CardSection
                   key={id}
                   withBorder
@@ -541,8 +523,8 @@ export default function CustomDiv({ type, item, email }) {
             </Text>
           </CardSection>
           <div className={classes.itemList}>
-            {upcomingPosts?.length > 0 ? (
-              upcomingPosts?.map((item, id) => (
+            {upcomingTrips?.length > 0 ? (
+              upcomingTrips.slice(0, 2)?.map((item, id) => (
                 <CardSection
                   key={id}
                   withBorder
@@ -848,8 +830,8 @@ export default function CustomDiv({ type, item, email }) {
             </Text>
           </CardSection>
           <div className={classes.itemList}>
-            {pastPosts?.length > 0 ? (
-              pastPosts?.map((item, id) => (
+            {pastTrips?.length > 0 ? (
+              pastTrips.slice(0, 2)?.map((item, id) => (
                 <CardSection
                   key={id}
                   withBorder
@@ -899,8 +881,8 @@ export default function CustomDiv({ type, item, email }) {
             </Text>
           </CardSection>
           <div className={classes.itemList}>
-            {sent?.length > 0 ? (
-              sent?.map((item, id) => (
+            {sentRequests?.length > 0 ? (
+              sentRequests.slice(0, 2)?.map((item, id) => (
                 <CardSection
                   key={id}
                   withBorder

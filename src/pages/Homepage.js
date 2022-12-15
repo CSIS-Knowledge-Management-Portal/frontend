@@ -20,6 +20,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import CustomDiv from "../components/CustomDiv";
 import { ReactComponent as BlankSVG } from "../assets/undraw_nothing.svg";
+import { UserContext } from "../utils/Context";
 
 const useStyles = createStyles((theme) => ({
   pageTitle: {
@@ -138,10 +139,11 @@ const useStyles = createStyles((theme) => ({
 }));
 
 function Homepage() {
+  const { userDetail } = React.useContext(UserContext);
   const { classes } = useStyles();
   let navigate = useNavigate();
   const [posts, setPosts] = React.useState(null);
-  const [email, setEmail] = React.useState();
+  // const [email, setEmail] = React.useState();
   const [dest, setDest] = React.useState("");
   const [src, setSrc] = React.useState("");
   const [dt, setDt] = React.useState("");
@@ -150,7 +152,11 @@ function Homepage() {
   const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
-    const Posts = async () => {
+    getAllPosts();
+  }, [setPosts]);
+
+  const getAllPosts = React.useCallback(
+    async (response) => {
       const data = await axios.get(
         `${process.env.REACT_APP_ROOT_URL}/api/trip/all-active`,
         {
@@ -158,42 +164,26 @@ function Homepage() {
         }
       );
       setPosts(data.data);
-    };
-    Posts();
 
-    const User = async () => {
-      const data = await axios.get(`${process.env.REACT_APP_ROOT_URL}/user/`, {
-        headers: { Authorization: localStorage.getItem("SavedToken") },
+      data.data?.map(async (item) => {
+        if (new Date(item.departure_date) < new Date()) {
+          await axios({
+            method: "post",
+            url: `${process.env.REACT_APP_ROOT_URL}/api/trip/done`,
+            headers: { Authorization: localStorage.getItem("SavedToken") },
+            data: {
+              trip_id: item.id,
+            },
+          });
+        }
       });
-      setEmail(data.data.email);
-    };
-    User();
-  }, [setPosts]);
+    },
+    [posts]
+  );
 
-  if (pageLoading && posts && email) {
+  if (pageLoading && posts && userDetail) {
     setPageLoading(false);
   }
-
-  const ToPast = async () => {
-    posts?.map((item, id) => {
-      if (new Date(item.departure_date) < new Date()) {
-        ToPastCall(item.id);
-      }
-    });
-  };
-
-  const ToPastCall = async (id) => {
-    await axios({
-      method: "post",
-      url: `${process.env.REACT_APP_ROOT_URL}/api/trip/done`,
-      headers: { Authorization: localStorage.getItem("SavedToken") },
-      data: {
-        trip_id: id,
-      },
-    });
-  };
-
-  if (posts) ToPast();
 
   const Filter = async () => {
     setLoading(true);
@@ -327,7 +317,7 @@ function Homepage() {
           {!loading ? (
             posts?.length > 0 ? (
               posts?.map((item, id) =>
-                item.creator.email === email ? null : (
+                item.creator.email === userDetail?.email ? null : (
                   <CustomDiv key={id} type={1} item={item} />
                 )
               )

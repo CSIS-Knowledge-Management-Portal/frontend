@@ -5,6 +5,7 @@ import Masonry from "react-masonry-css";
 import { useNavigate } from "react-router";
 import CustomDiv from "../components/CustomDiv";
 import { ReactComponent as BlankSVG } from "../assets/undraw_nothing.svg";
+import { UserContext } from "../utils/Context";
 
 const useStyles = createStyles((theme) => ({
   Title: {
@@ -87,30 +88,31 @@ const useStyles = createStyles((theme) => ({
 }));
 
 function PastTripsPage() {
+  let { pastTrips } = React.useContext(UserContext);
   const { classes } = useStyles();
-  let [pastPosts, setPastPosts] = React.useState(null);
+  // let [pastPosts, setPastPosts] = React.useState(null);
   const [pageLoading, setPageLoading] = React.useState(true);
 
   let navigate = useNavigate();
 
   React.useEffect(() => {
-    const Posts = async () => {
-      const data = await axios.get(
-        `${process.env.REACT_APP_ROOT_URL}/api/trip/past`,
-        {
-          headers: { Authorization: localStorage.getItem("SavedToken") },
-        }
-      );
-      setPastPosts(data.data);
-    };
-    Posts();
+    // const Posts = async () => {
+    //   const data = await axios.get(
+    //     `${process.env.REACT_APP_ROOT_URL}/api/trip/past`,
+    //     {
+    //       headers: { Authorization: localStorage.getItem("SavedToken") },
+    //     }
+    //   );
+    //   setPastPosts(data.data);
+    // };
+    // Posts();
   }, []);
 
-  pastPosts = pastPosts?.map(function (item, id) {
+  pastTrips = pastTrips?.map(function (item, id) {
     return <CustomDiv type={4} key={id} item={item} />;
   });
 
-  if (pageLoading && pastPosts) {
+  if (pageLoading && pastTrips) {
     setPageLoading(false);
   }
 
@@ -127,8 +129,8 @@ function PastTripsPage() {
           className="my-masonry-grid"
           columnClassName="my-masonry-grid_column"
         >
-          {pastPosts.length > 0 ? (
-            pastPosts
+          {pastTrips.length > 0 ? (
+            pastTrips
           ) : (
             <BlankSVG
               width={"50%"}

@@ -12,6 +12,7 @@ import { useMediaQuery } from "@mantine/hooks";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import { ReactComponent as BlankSVG } from "../assets/undraw_nothing.svg";
+import { UserContext } from "../utils/Context";
 
 const useStyles = createStyles((theme) => ({
   pageTitle: {
@@ -54,39 +55,18 @@ const useStyles = createStyles((theme) => ({
 }));
 
 function PendingApprovalPage() {
+  const { sentRequests, recievedRequests } = React.useContext(UserContext);
   const { classes } = useStyles();
   const largeScreen = useMediaQuery("(min-width: 900px)");
   let navigate = useNavigate();
 
-  const [sent, setSent] = React.useState();
-  const [received, setReceived] = React.useState();
+  // const [sent, setSent] = React.useState();
+  // const [received, setReceived] = React.useState();
   const [pageLoading, setPageLoading] = React.useState(true);
 
-  React.useEffect(() => {
-    const Sent = async () => {
-      const data = await axios.get(
-        `${process.env.REACT_APP_ROOT_URL}/api/request/all-sent`,
-        {
-          headers: { Authorization: localStorage.getItem("SavedToken") },
-        }
-      );
-      setSent(data.data);
-    };
-    Sent();
+  React.useEffect(() => {}, []);
 
-    const Received = async () => {
-      const data = await axios.get(
-        `${process.env.REACT_APP_ROOT_URL}/api/request/all-received`,
-        {
-          headers: { Authorization: localStorage.getItem("SavedToken") },
-        }
-      );
-      setReceived(data.data);
-    };
-    Received();
-  }, []);
-
-  if (pageLoading && received && sent) {
+  if (pageLoading && recievedRequests && sentRequests) {
     setPageLoading(false);
   }
 
@@ -110,8 +90,8 @@ function PendingApprovalPage() {
           </Tabs.List>
 
           <Tabs.Panel value="sent" pl="xl">
-            {sent?.length > 0 ? (
-              sent?.map((item, id) => (
+            {sentRequests?.length > 0 ? (
+              sentRequests?.map((item, id) => (
                 <CustomDiv key={id} type={5} item={item} />
               ))
             ) : (
@@ -129,8 +109,8 @@ function PendingApprovalPage() {
           </Tabs.Panel>
 
           <Tabs.Panel value="recieved" pl="xl">
-            {received?.length > 0 ? (
-              received?.map((item, id) => (
+            {recievedRequests?.length > 0 ? (
+              recievedRequests?.map((item, id) => (
                 <CustomDiv type={6} key={id} item={item} />
               ))
             ) : (

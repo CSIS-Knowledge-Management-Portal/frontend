@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { googleLogout } from "@react-oauth/google";
 import { ReactComponent as Logo } from "../assets/travelbphc-logo-sm.svg";
+import { UserContext } from "../utils/Context";
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -86,9 +87,9 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-function Navbar({ loggedIn, setLoggedIn, setUserDetail }) {
+function Navbar({ loggedIn, setLoggedIn }) {
   const { classes } = useStyles();
-  const [user, setUser] = React.useState();
+  const { userDetail } = React.useContext(UserContext);
 
   const Logout = () => {
     navigate("/");
@@ -99,16 +100,7 @@ function Navbar({ loggedIn, setLoggedIn, setUserDetail }) {
 
   let navigate = useNavigate();
 
-  React.useEffect(() => {
-    const User = async () => {
-      const data = await axios.get(`${process.env.REACT_APP_ROOT_URL}/user/`, {
-        headers: { Authorization: localStorage.getItem("SavedToken") },
-      });
-      setUser(data.data);
-      setUserDetail(data.data);
-    };
-    User();
-  }, [loggedIn]);
+  React.useEffect(() => {}, [loggedIn]);
 
   return (
     <div
@@ -140,7 +132,7 @@ function Navbar({ loggedIn, setLoggedIn, setUserDetail }) {
               <Avatar
                 variant="filled"
                 className={classes.avatar}
-                src={user?.pfp}
+                src={userDetail?.pfp}
               />
               <IconChevronDown size={14} />
             </div>

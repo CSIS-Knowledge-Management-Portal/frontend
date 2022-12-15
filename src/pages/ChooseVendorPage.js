@@ -12,6 +12,7 @@ import React from "react";
 import { useLocation, useNavigate } from "react-router";
 import Cabs from "../utils/cabs";
 import Autos from "../utils/Auto";
+import { UserContext } from "../utils/Context";
 
 const useStyles = createStyles((theme) => ({
   pageTitle: {
@@ -153,6 +154,7 @@ const useStyles = createStyles((theme) => ({
 }));
 
 function ChooseVendorPage() {
+  const { upcomingTrips, setUpcomingTrips } = React.useContext(UserContext);
   const { classes } = useStyles();
   const [vendor, setVendor] = React.useState(null);
   const [vehicle, setVehicle] = React.useState(null);
@@ -183,9 +185,23 @@ function ChooseVendorPage() {
         vendor_phone: phone,
       },
     });
+    getUpcomingTrips();
     setOpened(true);
     setLoading(false);
   };
+
+  const getUpcomingTrips = React.useCallback(
+    async (response) => {
+      const data = await axios.get(
+        `${process.env.REACT_APP_ROOT_URL}/api/trip/upcoming`,
+        {
+          headers: { Authorization: localStorage.getItem("SavedToken") },
+        }
+      );
+      setUpcomingTrips(data.data);
+    },
+    [upcomingTrips]
+  );
 
   const [opened, setOpened] = React.useState(false);
   console.log("pass", state.departure_time);

@@ -4,6 +4,7 @@ import React from "react";
 import { useNavigate } from "react-router";
 import CustomDiv from "../components/CustomDiv";
 import { ReactComponent as BlankSVG } from "../assets/undraw_nothing.svg";
+import { UserContext } from "../utils/Context";
 
 const useStyles = createStyles((theme) => ({
   Title: {
@@ -86,35 +87,13 @@ const useStyles = createStyles((theme) => ({
 }));
 
 function UpcomingTripsPage() {
+  const { userDetail, upcomingTrips } = React.useContext(UserContext);
   const { classes } = useStyles();
-  const [upcomingPosts, setUpcomingPosts] = React.useState(null);
-  const [email, setEmail] = React.useState(null);
   const [pageLoading, setPageLoading] = React.useState(true);
 
   let navigate = useNavigate();
 
-  React.useEffect(() => {
-    const Posts = async () => {
-      const data = await axios.get(
-        `${process.env.REACT_APP_ROOT_URL}/api/trip/upcoming`,
-        {
-          headers: { Authorization: localStorage.getItem("SavedToken") },
-        }
-      );
-      setUpcomingPosts(data.data);
-    };
-    Posts();
-
-    const User = async () => {
-      const data = await axios.get(`${process.env.REACT_APP_ROOT_URL}/user/`, {
-        headers: { Authorization: localStorage.getItem("SavedToken") },
-      });
-      setEmail(data.data.email);
-    };
-    User();
-  }, []);
-
-  if (pageLoading && upcomingPosts && email) {
+  if (pageLoading && upcomingTrips && userDetail) {
     setPageLoading(false);
   }
 
@@ -125,9 +104,14 @@ function UpcomingTripsPage() {
       </Button>
       <div className={classes.wrapper}>
         <Text className={classes.pageTitle}>Upcoming Trips</Text>
-        {upcomingPosts?.length > 0 ? (
-          upcomingPosts?.map((item, id) => (
-            <CustomDiv key={id} type={7} item={item} email={email} />
+        {upcomingTrips?.length > 0 ? (
+          upcomingTrips?.map((item, id) => (
+            <CustomDiv
+              key={id}
+              type={7}
+              item={item}
+              email={userDetail?.email}
+            />
           ))
         ) : (
           <BlankSVG

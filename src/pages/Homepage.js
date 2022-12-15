@@ -357,7 +357,7 @@ function Homepage() {
         title="Select Filters"
       >
         <div className={classes.Textbox}>
-          <Text c="dimmed">Source</Text>
+          <Text c="dimmed">Destination</Text>
           <TextInput
             onChange={(event) => setDest(event.currentTarget.value)}
             value={src}
@@ -379,9 +379,9 @@ function Homepage() {
           </Chip.Group>
         </div>
         <div className={classes.Textbox}>
-          <Text c="dimmed">Destination</Text>
+          <Text c="dimmed">Source</Text>
           <TextInput
-            onChange={(event) => setDest(event.currentTarget.value)}
+            onChange={(event) => setSrc(event.currentTarget.value)}
             value={dest}
             rightSection={
               <ActionIcon

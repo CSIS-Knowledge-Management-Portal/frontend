@@ -127,7 +127,7 @@ function UpcomingTripsPage() {
       </div>
     </>
   ) : (
-    <Center style={{ width: "100%", height: "100%" }}>
+    <Center style={{ width: "100%", height: window.innerHeight - 68 }}>
       <Loader />
     </Center>
   );

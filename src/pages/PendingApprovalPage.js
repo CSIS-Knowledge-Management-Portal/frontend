@@ -60,8 +60,6 @@ function PendingApprovalPage() {
   const largeScreen = useMediaQuery("(min-width: 900px)");
   let navigate = useNavigate();
 
-  // const [sent, setSent] = React.useState();
-  // const [received, setReceived] = React.useState();
   const [pageLoading, setPageLoading] = React.useState(true);
 
   React.useEffect(() => {}, []);
@@ -130,7 +128,7 @@ function PendingApprovalPage() {
       </div>
     </>
   ) : (
-    <Center style={{ width: "100%", height: "100%" }}>
+    <Center style={{ width: "100%", height: window.innerHeight - 68 }}>
       <Loader />
     </Center>
   );

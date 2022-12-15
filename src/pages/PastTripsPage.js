@@ -90,23 +90,9 @@ const useStyles = createStyles((theme) => ({
 function PastTripsPage() {
   let { pastTrips } = React.useContext(UserContext);
   const { classes } = useStyles();
-  // let [pastPosts, setPastPosts] = React.useState(null);
   const [pageLoading, setPageLoading] = React.useState(true);
 
   let navigate = useNavigate();
-
-  React.useEffect(() => {
-    // const Posts = async () => {
-    //   const data = await axios.get(
-    //     `${process.env.REACT_APP_ROOT_URL}/api/trip/past`,
-    //     {
-    //       headers: { Authorization: localStorage.getItem("SavedToken") },
-    //     }
-    //   );
-    //   setPastPosts(data.data);
-    // };
-    // Posts();
-  }, []);
 
   pastTrips = pastTrips?.map(function (item, id) {
     return <CustomDiv type={4} key={id} item={item} />;
@@ -147,7 +133,7 @@ function PastTripsPage() {
       </div>
     </>
   ) : (
-    <Center style={{ width: "100%", height: "100%" }}>
+    <Center style={{ width: "100%", height: window.innerHeight - 68 }}>
       <Loader />
     </Center>
   );

@@ -12,7 +12,7 @@ root.render(
       withGlobalStyles
       withNormalizeCSS
       theme={{
-        colorScheme: "dark",
+        colorScheme: "light",
         fontFamily: "ArialN, sans-serif",
         fontWeight: 400,
         loader: "bars",
@@ -30,28 +30,29 @@ root.render(
             "#000000",
           ],
           customWhite: [
-            "#F0BBDD",
-            "#ED9BCF",
-            "#EC7CC3",
-            "#ED5DB8",
-            "#F13EAF",
+            "#ffffff",
+            "#f6f6f6",
+            "#ececec",
+            "#e1e1e1",
+            "#d0d0d0",
             "#F71FA7",
             "#FF00A1",
             "#E00890",
             "#C50E82",
-            "#AD1374",
+            "#000000",
           ],
+          customBlue: ["#03254c", "#1167b1", "#187bcd", "#2a9df4", "#d0efff"],
         },
         globalStyles: (theme) => ({
           body: {
             backgroundColor:
               theme.colorScheme === "dark"
                 ? theme.colors.customDark[7]
-                : theme.white,
+                : theme.colors.customWhite[2],
             color:
               theme.colorScheme === "dark"
                 ? theme.colors.customDark[0]
-                : theme.black,
+                : theme.colors.customWhite[9],
           },
         }),
       }}

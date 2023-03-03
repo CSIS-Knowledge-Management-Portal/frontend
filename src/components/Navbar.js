@@ -1,4 +1,13 @@
-import { Avatar, Button, createStyles, Menu, Text } from "@mantine/core";
+import {
+  Avatar,
+  Button,
+  createStyles,
+  Flex,
+  Menu,
+  Select,
+  Text,
+  Title,
+} from "@mantine/core";
 import React from "react";
 import { IconChevronDown, IconLogout } from "@tabler/icons";
 import { Link, useNavigate } from "react-router-dom";
@@ -10,10 +19,13 @@ import { UserContext } from "../utils/Context";
 const useStyles = createStyles((theme) => ({
   wrapper: {
     backgroundColor: theme.colors.customDark[6],
+    color: theme.colors.customDark[0],
     alignItems: "center",
     position: "sticky",
     top: 0,
-    height: 68,
+    height: 48,
+    paddingTop: 4,
+    paddingBottom: 4,
     paddingLeft: 20,
     paddingRight: 20,
     width: window.innerWidth,
@@ -24,17 +36,14 @@ const useStyles = createStyles((theme) => ({
     [`@media (max-width: ${theme.breakpoints.xl}px)`]: {
       paddingLeft: 16,
       paddingRight: 16,
-      height: 68 * 0.85,
     },
     [`@media (max-width: ${theme.breakpoints.lg}px)`]: {
       paddingLeft: 14,
       paddingRight: 14,
-      height: 68 * 0.7,
     },
     [`@media (max-width: ${theme.breakpoints.md}px)`]: {
       paddingLeft: 10,
       paddingRight: 10,
-      height: 48,
     },
   },
 
@@ -61,16 +70,31 @@ const useStyles = createStyles((theme) => ({
     flexDirection: "row",
     justifyContent: "flex-end",
     alignItems: "center",
-    cursor: "pointer",
     position: "absolute",
     right: 20,
+    gap: 20,
+  },
+
+  avatarWrapper: {
+    cursor: "pointer",
+    paddingLeft: 4,
+    paddingRight: 4,
+    borderRadius: 20,
+    transitionDuration: "0.5s",
+    "&:hover": {
+      backgroundColor: theme.colors.customDark[1],
+      transitionDuration: "0.5s",
+    },
   },
 
   avatar: {
-    height: 45,
-    width: 45,
+    // top: 12,
+    cursor: "pointer",
+    height: 40,
+    width: 40,
     marginRight: 10,
     borderRadius: 999,
+
     [`@media (max-width: ${theme.breakpoints.xl}px)`]: {
       height: 50 * 0.85,
       width: 50 * 0.85,
@@ -107,35 +131,35 @@ function Navbar({ loggedIn, setLoggedIn }) {
       className={classes.wrapper}
       style={{ display: loggedIn ? null : "none" }}
     >
-      <Logo
-        className={classes.logo}
-        onClick={() => navigate("/")}
-        style={{ cursor: "pointer" }}
-      />
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 10,
-        }}
-      >
-        {/* <Link to="/">
-          <Button variant="subtle">Dashboard</Button>
-        </Link>
-        <Link to="/create-post">
-          <Button variant="subtle">Create Post</Button>
-        </Link> */}
+      <Text fz="xl" fw={700}>
+        Knowledge Management Portal
+      </Text>
+      <div className={classes.avatarContainer}>
+        <Select
+          // label="Dashboard View"
+          placeholder="Select View"
+          data={[
+            { value: "Admin", label: "Admin" },
+            { value: "Moderator", label: "Moderator" },
+            { value: "User", label: "User" },
+          ]}
+        />
+        <Text fz="md">Hi, Aarush!</Text>
         <Menu shadow="md" width={200} position="top-end">
-          <Menu.Target className={classes.avatarContainer}>
-            <div>
+          <Menu.Target>
+            <Flex
+              justify="center"
+              align="center"
+              className={classes.avatarWrapper}
+              direction="row"
+            >
               <Avatar
                 variant="filled"
                 className={classes.avatar}
                 src={userDetail?.pfp}
               />
               <IconChevronDown size={14} />
-            </div>
+            </Flex>
           </Menu.Target>
 
           <Menu.Dropdown>

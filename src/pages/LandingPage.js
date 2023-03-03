@@ -1,17 +1,14 @@
 import {
-  Text,
   createStyles,
-  Grid,
   Button,
-  Header,
   Title,
   BackgroundImage,
-  Center,
+  Image,
 } from "@mantine/core";
 import React from "react";
 import { Link } from "react-router-dom";
-import CustomDiv from "../components/CustomDiv";
 import BG from "../assets/bg.jpg";
+import logo from "../assets/bits-logo.png";
 import { GoogleLogin } from "@react-oauth/google";
 
 const useStyles = createStyles((theme) => ({
@@ -24,8 +21,9 @@ const useStyles = createStyles((theme) => ({
   },
 
   Title: {
+    marginTop: 20,
     fontSize: 44,
-
+    textAlign: "center",
     [`@media (max-width: ${theme.breakpoints.xl}px)`]: {
       fontSize: 44 * 0.85,
     },
@@ -79,12 +77,16 @@ const useStyles = createStyles((theme) => ({
     },
   },
 
+  wrapper: {
+    backgroundColor: "#000000",
+    opacity: 0.99,
+  },
+
   BG: {
     height: window.innerHeight,
     width: window.innerWidth,
-    backgroundColor: "black",
     position: "absolute",
-    opacity: 0.4,
+    opacity: 0.5,
     filter: "blur(5px)",
     WebkitFilter: "blur(5px)",
     zIndex: -1,
@@ -94,50 +96,47 @@ const useStyles = createStyles((theme) => ({
 function LandingPage({ loggedIn, setLoggedIn }) {
   const { classes } = useStyles();
 
-  const Login = async (response) => {
-    console.log("response", response);
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", `${process.env.REACT_APP_ROOT_URL}/user/auth`);
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    xhr.send("credential=" + response.credential);
-    xhr.onload = function () {
-      let data = JSON.parse(xhr.responseText);
-      console.log("Signed in as: ", data);
-      localStorage.setItem("SavedToken", "Bearer " + data.token);
-      setLoggedIn(true);
-    };
-  };
+  //Login function for Google OAuth
+  // const Login = async (response) => {
+  //   console.log("response", response);
+  //   var xhr = new XMLHttpRequest();
+  //   xhr.open("POST", `${process.env.REACT_APP_ROOT_URL}/user/auth`);
+  //   xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  //   xhr.send("credential=" + response.credential);
+  //   xhr.onload = function () {
+  //     let data = JSON.parse(xhr.responseText);
+  //     console.log("Signed in as: ", data);
+  //     localStorage.setItem("SavedToken", "Bearer " + data.token);
+  //     setLoggedIn(true);
+  //   };
+  // };
 
   React.useEffect(() => {}, [loggedIn]);
 
   return (
-    <>
+    <div className={classes.wrapper}>
       <BackgroundImage src={BG} className={classes.BG} />
       <div className={classes.Textbox}>
-        <Title order={1} color="#fff" className={classes.Title}>
-          Travel@BPHC
-        </Title>
+        <Image src={logo} width={150} height={150} />
         <Title order={2} color="#fff" className={classes.SubTitle}>
-          Travelling together was never simpler!
+          BITS Pilani Hyderabad Campus
+        </Title>
+        <Title order={1} color="#fff" className={classes.Title}>
+          Knowledge Management Portal
         </Title>
         <Button.Group className={classes.ButtonGroup}>
-          <GoogleLogin
-            // clientId={process.env.REACT_APP_GOOGLE_CLIENT_KEY}
-            theme="dark"
-            // render={(renderProps) => (
-            //   <Button variant="outline" onClick={renderProps.onClick}>
-            //     Login with BITS Mail
-            //   </Button>
-            // )}
+          {/* <GoogleLogin
+            theme="light"
             buttonText="Login"
-            onSuccess={(credentialResponse) => {
-              Login(credentialResponse);
-            }}
-            onFailure={Login}
-          />
+            // onSuccess={(credentialResponse) => {
+            //   Login(credentialResponse);
+            // }}
+            // onFailure={Login}
+          /> */}
+          <Button onClick={() => setLoggedIn(true)}>Login</Button>
         </Button.Group>
       </div>
-    </>
+    </div>
   );
 }
 

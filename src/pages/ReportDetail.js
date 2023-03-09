@@ -36,10 +36,10 @@ import { useNavigate, useParams } from "react-router";
 
 const useStyles = createStyles((theme) => ({
   actionWrapper: {
-    backgroundColor: "#A4ABBD",
+    // backgroundColor: "#A4ABBD",
     position: "sticky",
     top: 60,
-    height: 500,
+    // height: 500,
     padding: 10,
     margin: 10,
   },
@@ -154,6 +154,7 @@ function ReportDetail() {
               <Flex gap="md" direction="column">
                 <Button>View Entries / Generate Report</Button>
                 <Button>New Entry</Button>
+                <Button bg={"red"}>Delete Report</Button>
               </Flex>
             </div>
           </Grid.Col>

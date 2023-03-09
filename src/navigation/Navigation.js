@@ -12,6 +12,7 @@ import axios from "axios";
 import NavMenu from "../components/NavMenu";
 import AllReport from "../pages/AllReport";
 import ReportDetail from "../pages/ReportDetail";
+import NewEntry from "../pages/NewEntry";
 
 const useStyles = createStyles((theme) => ({
   navigationwrapper: {
@@ -36,7 +37,7 @@ const useStyles = createStyles((theme) => ({
   },
 
   wrapper: {
-    margin: 10,
+    // margin: 10,
     padding: 0,
   },
 }));
@@ -157,7 +158,11 @@ function Navigation() {
         <UserContext.Provider value={contextValue}>
           <Navbar loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
           {loggedIn ? (
-            <Grid gutter={"xl"} columns={12}>
+            <Grid
+              gutter={"xl"}
+              columns={12}
+              sx={{ minHeight: window.innerHeight - 48 }}
+            >
               <Grid.Col md={3} className={classes.navigationwrapper}>
                 <NavMenu />
               </Grid.Col>
@@ -176,7 +181,7 @@ function Navigation() {
                         element={<ReportDetail />}
                       />
                     </Route>
-
+                    <Route path="/new-entry" element={<NewEntry />} />
                     <Route path="*" element={<Page404 />} />
                   </Routes>
                 </Container>

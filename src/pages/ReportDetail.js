@@ -65,13 +65,20 @@ function ReportDetail() {
     pageLoaded();
   }
 
+  const navigate = useNavigate();
+
   const MotionBox = motion(Box);
 
   const largeScreen = useMediaQuery("(min-width: 800px)");
 
   return !pageLoading ? (
     <>
-      <Flex gap="md" direction="column" wrap="wrap" sx={{ marginBottom: 30 }}>
+      <Flex
+        gap="md"
+        direction="column"
+        wrap="wrap"
+        sx={{ padding: 20, marginBottom: 30 }}
+      >
         <Title order={3}>Lorem Ipsum Dolor</Title>
         <Divider />
         <Grid gutter={"xl"} columns={3}>
@@ -153,7 +160,9 @@ function ReportDetail() {
             <div className={classes.actionWrapper}>
               <Flex gap="md" direction="column">
                 <Button>View Entries / Generate Report</Button>
-                <Button>New Entry</Button>
+                <Button onClick={() => navigate("/new-entry")}>
+                  New Entry
+                </Button>
                 <Button bg={"red"}>Delete Report</Button>
               </Flex>
             </div>

@@ -125,7 +125,7 @@ function Dashboard() {
           gap="md"
           direction="column"
           wrap="wrap"
-          sx={{ marginBottom: 30 }}
+          sx={{ padding: 20, marginBottom: 30 }}
         >
           <Title order={3}>Report</Title>
           <Carousel

@@ -157,17 +157,6 @@ function AllReport() {
                   </ActionIcon>
                 }
               />
-              <Chip.Group
-                className={classes.chip}
-                // value={dest}
-                // onChange={setDest}
-              >
-                <Chip value="Campus">Campus</Chip>
-                <Chip value="Airport">Airport</Chip>
-                <Chip value="F3">F3</Chip>
-                <Chip value="BnB">BnB</Chip>
-                <Chip value="Railway Stn">Rlw Stn</Chip>
-              </Chip.Group>
             </div>
             <div className={classes.Textbox}>
               <Text c="dimmed">Source</Text>
@@ -183,17 +172,6 @@ function AllReport() {
                   </ActionIcon>
                 }
               />
-              <Chip.Group
-                className={classes.chip}
-                // value={src}
-                // onChange={setSrc}
-              >
-                <Chip value="Campus">Campus</Chip>
-                <Chip value="Airport">Airport</Chip>
-                <Chip value="F3">F3</Chip>
-                <Chip value="BnB">BnB</Chip>
-                <Chip value="Railway Stn">Rlw Stn</Chip>
-              </Chip.Group>
             </div>
             <div className={classes.Textbox}>
               <Text c="dimmed">Date</Text>
@@ -217,7 +195,10 @@ function AllReport() {
               />
             </div>
           </Modal>
-          <Button onClick={open}>Filter</Button>
+          <Button onClick={open} variant="outline">
+            Filter
+          </Button>
+          <Button onClick={open}>+ Create New Report</Button>
           <Text sx={{ marginLeft: "auto", marginRight: 30 }}>
             Showing 10 / 256 total results
           </Text>

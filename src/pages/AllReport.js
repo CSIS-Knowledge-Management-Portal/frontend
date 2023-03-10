@@ -198,7 +198,9 @@ function AllReport() {
           <Button onClick={open} variant="outline">
             Filter
           </Button>
-          <Button onClick={open}>+ Create New Report</Button>
+          <Button onClick={() => navigate("/new-report")}>
+            + Create New Report
+          </Button>
           <Text sx={{ marginLeft: "auto", marginRight: 30 }}>
             Showing 10 / 256 total results
           </Text>

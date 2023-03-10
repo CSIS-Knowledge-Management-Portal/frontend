@@ -23,6 +23,7 @@ import {
   Chip,
   ActionIcon,
   Pagination,
+  Group,
 } from "@mantine/core";
 import React from "react";
 import { IconSearch, IconX } from "@tabler/icons";
@@ -50,7 +51,7 @@ function ReportDetail() {
   const { classes } = useStyles();
   const [pageLoading, setPageLoading] = React.useState(false);
   const [searchTerm, setSearchTerm] = React.useState("");
-  const [modalOpened, { open, close }] = useDisclosure(false);
+  const [opened, { open, close }] = useDisclosure(false);
   const [activePage, setPage] = React.useState(1);
   const { id } = useParams();
 
@@ -163,7 +164,27 @@ function ReportDetail() {
                 <Button onClick={() => navigate("/new-entry")}>
                   New Entry
                 </Button>
-                <Button bg={"red"}>Delete Report</Button>
+                <Button bg={"red"} onClick={open}>
+                  Delete Report
+                </Button>
+                <Modal
+                  opened={opened}
+                  onClose={close}
+                  size="auto"
+                  title="Confirm Action"
+                >
+                  <Text>
+                    Are you sure you want to delete this report? This action
+                    cannot be undone.
+                  </Text>
+
+                  <Group mt="xl" position="right" onClick={close}>
+                    <Button variant="outline" onClick={close}>
+                      No
+                    </Button>
+                    <Button>Yes</Button>
+                  </Group>
+                </Modal>
               </Flex>
             </div>
           </Grid.Col>

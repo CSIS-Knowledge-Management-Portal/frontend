@@ -13,6 +13,7 @@ import NavMenu from "../components/NavMenu";
 import AllReport from "../pages/AllReport";
 import ReportDetail from "../pages/ReportDetail";
 import NewEntry from "../pages/NewEntry";
+import NewReport from "../pages/NewReport";
 
 const useStyles = createStyles((theme) => ({
   navigationwrapper: {
@@ -182,6 +183,7 @@ function Navigation() {
                       />
                     </Route>
                     <Route path="/new-entry" element={<NewEntry />} />
+                    <Route path="/new-report" element={<NewReport />} />
                     <Route path="*" element={<Page404 />} />
                   </Routes>
                 </Container>

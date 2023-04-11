@@ -97,19 +97,19 @@ function LandingPage({ loggedIn, setLoggedIn }) {
   const { classes } = useStyles();
 
   //Login function for Google OAuth
-  // const Login = async (response) => {
-  //   console.log("response", response);
-  //   var xhr = new XMLHttpRequest();
-  //   xhr.open("POST", `${process.env.REACT_APP_ROOT_URL}/user/auth`);
-  //   xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-  //   xhr.send("credential=" + response.credential);
-  //   xhr.onload = function () {
-  //     let data = JSON.parse(xhr.responseText);
-  //     console.log("Signed in as: ", data);
-  //     localStorage.setItem("SavedToken", "Bearer " + data.token);
-  //     setLoggedIn(true);
-  //   };
-  // };
+  const Login = async (response) => {
+    console.log("response", response);
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", `${process.env.REACT_APP_ROOT_URL}/users/auth`);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.send("credential=" + response.credential);
+    xhr.onload = function () {
+      let data = JSON.parse(xhr.responseText);
+      console.log("Signed in as: ", data);
+      localStorage.setItem("SavedToken", "Bearer " + data.token);
+      setLoggedIn(true);
+    };
+  };
 
   React.useEffect(() => {}, [loggedIn]);
 
@@ -125,15 +125,15 @@ function LandingPage({ loggedIn, setLoggedIn }) {
           Knowledge Management Portal
         </Title>
         <Button.Group className={classes.ButtonGroup}>
-          {/* <GoogleLogin
+          <GoogleLogin
             theme="light"
             buttonText="Login"
-            // onSuccess={(credentialResponse) => {
-            //   Login(credentialResponse);
-            // }}
-            // onFailure={Login}
-          /> */}
-          <Button onClick={() => setLoggedIn(true)}>Login</Button>
+            onSuccess={(credentialResponse) => {
+              Login(credentialResponse);
+            }}
+            onFailure={Login}
+          />
+          {/* <Button onClick={() => setLoggedIn(true)}>Login</Button> */}
         </Button.Group>
       </div>
     </div>

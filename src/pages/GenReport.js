@@ -3,50 +3,33 @@ import {
   createStyles,
   TextInput,
   Button,
-  Avatar,
-  Grid,
   Divider,
-  Dialog,
   Loader,
   Center,
-  Collapse,
-  ScrollArea,
-  NavLink,
   Select,
   Title,
   Flex,
   Input,
   Tooltip,
-  Menu,
   Box,
   Modal,
   Chip,
   ActionIcon,
   Pagination,
+  Group,
 } from "@mantine/core";
 import React from "react";
-import {
-  IconLock,
-  IconEdit,
-  IconChevronDown,
-  IconChevronUp,
-  IconHome2,
-  IconSearch,
-  IconCross,
-  IconX,
-  IconFilter,
-  IconCalendar,
-} from "@tabler/icons";
-import axios from "axios";
-import CustomDiv from "../components/CustomDiv";
+import { IconSearch, IconX } from "@tabler/icons";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { UserContext } from "../utils/Context";
-import { Carousel } from "@mantine/carousel";
 import { motion } from "framer-motion";
 import CustomMenu from "../components/CustomMenu";
 import { DatePicker } from "@mantine/dates";
 import dayjs from "dayjs";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
+import CustomTable from "../components/CustomTable";
+import data from "../data/tableData";
+import * as XLSX from "xlsx/xlsx.mjs";
 
 const useStyles = createStyles((theme) => ({
   input: {
@@ -68,15 +51,35 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-function AllReport() {
+function GenReport() {
   const { userDetail, upcomingTrips } = React.useContext(UserContext);
   const { classes } = useStyles();
   const [pageLoading, setPageLoading] = React.useState(false);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [modalOpened, { open, close }] = useDisclosure(false);
+  const [columnModalOpened, setColumnModalOpened] = React.useState(false);
+  const [value, setValue] = React.useState(["react"]);
   const [activePage, setPage] = React.useState(1);
-  const navigate = useNavigate();
+  const [template, setTemplate] = React.useState(null);
+  const { state } = useLocation();
+  const { TABLE } = state;
 
+  const download_report = () => {
+    var table_elt = document.getElementById("report-generate-table");
+    var workbook = XLSX.utils.table_to_book(table_elt);
+    var ws = workbook.Sheets["Sheet1"];
+    // XLSX.utils.sheet_add_aoa(
+    //   ws,
+    //   [[], ["Created " + new Date().toISOString()]],
+    //   {
+    //     origin: -1,
+    //   }
+    // );
+    XLSX.writeFile(workbook, "Report.xlsx");
+  };
+
+  const navigate = useNavigate();
+  console.log(value);
   const pageLoaded = React.useCallback(
     (response) => {
       setPageLoading(false);
@@ -94,9 +97,56 @@ function AllReport() {
 
   return !pageLoading ? (
     <>
-      <Flex gap="md" direction="column" wrap="wrap" sx={{ marginBottom: 30 }}>
-        <Title order={3}>Report</Title>
+      <Flex gap="md" direction="column" wrap="wrap" sx={{ padding: 10 }}>
+        <Title order={3}>Generate Report</Title>
         <Divider />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            gap: 20,
+            alignItems: "center",
+          }}
+        >
+          <Select
+            searchable
+            nothingFound="No options"
+            clearable
+            placeholder="Select Template"
+            value={template}
+            onChange={setTemplate}
+            data={[
+              { value: "Lorem", label: "Lorem" },
+              { value: "Ipsum", label: "Ipsum" },
+              { value: "Dolor", label: "Dolor" },
+            ]}
+          />
+          <Button
+            disabled={template === null ? true : false}
+            onClick={() => setColumnModalOpened(true)}
+          >
+            Select Columns
+          </Button>
+
+          <Modal
+            opened={columnModalOpened}
+            onClose={() => setColumnModalOpened(false)}
+            title="Filters"
+            // centered
+          >
+            <Chip.Group multiple value={value} onChange={setValue}>
+              <Group position="center">
+                {["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"].map(
+                  (item, id) => (
+                    <Chip key={id} value={item}>
+                      Chip {item}
+                    </Chip>
+                  )
+                )}
+              </Group>
+            </Chip.Group>
+          </Modal>
+        </div>
         <div
           style={{
             display: "flex",
@@ -198,37 +248,24 @@ function AllReport() {
           <Button onClick={open} variant="outline">
             Filter
           </Button>
-          <Button onClick={() => navigate("/new-report")}>
-            + Create New Report
-          </Button>
+          <Button onClick={() => download_report()}>Generate Report</Button>
           <Text sx={{ marginLeft: "auto", marginRight: 30 }}>
             Showing 10 / 256 total results
           </Text>
         </div>
+
+        <Divider />
+        <div
+          style={{
+            paddingTop: 20,
+          }}
+        >
+          <CustomTable data={TABLE} />
+        </div>
+        <Center>
+          <Pagination value={activePage} onChange={setPage} total={10} />
+        </Center>
       </Flex>
-      <Divider />
-      <ScrollArea
-        h={"auto"}
-        style={{
-          paddingTop: 20,
-        }}
-      >
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((item, id) => (
-          <Center>
-            <MotionBox
-              whileHover={{ scale: 1.02 }}
-              key={id}
-              className={classes.box}
-              onClick={() => navigate(`/report-detail/${id}`)}
-            >
-              Box {id}
-            </MotionBox>
-          </Center>
-        ))}
-      </ScrollArea>
-      <Center>
-        <Pagination value={activePage} onChange={setPage} total={10} />
-      </Center>
     </>
   ) : (
     <Center style={{ width: "100%", height: window.innerHeight - 68 }}>
@@ -237,4 +274,4 @@ function AllReport() {
   );
 }
 
-export default AllReport;
+export default GenReport;

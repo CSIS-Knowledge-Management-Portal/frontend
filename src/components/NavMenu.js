@@ -1,7 +1,8 @@
 import { createStyles, NavLink, ScrollArea } from "@mantine/core";
-import { IconHome2 } from "@tabler/icons";
+import { IconHome2, IconTable } from "@tabler/icons";
 import React from "react";
 import { useNavigate } from "react-router";
+import { UserContext } from "../utils/Context";
 
 const useStyles = createStyles((theme) => ({
   menu: {
@@ -24,6 +25,8 @@ const useStyles = createStyles((theme) => ({
 function NavMenu() {
   const { classes } = useStyles();
   const navigate = useNavigate();
+  const { recordTypes } = React.useContext(UserContext);
+
   const [active, setActive] = React.useState("home");
   return (
     <ScrollArea className={classes.menu} h={"90%"} w={"90%"}>
@@ -38,27 +41,9 @@ function NavMenu() {
         }}
       />
       <NavLink
-        defaultOpened
+        // defaultOpened
         className={classes.menuItem}
-        label="Report"
-        childrenOffset={28}
-      >
-        <NavLink
-          className={classes.menuItem}
-          label="All Report"
-          active={active == "all-report" ? true : false}
-          onClick={() => {
-            setActive("all-report");
-            navigate("all-report");
-          }}
-        />
-        <NavLink className={classes.menuItem} label="Second child link" />
-        <NavLink className={classes.menuItem} label="Third child link" />
-      </NavLink>
-      <NavLink
-        defaultOpened
-        className={classes.menuItem}
-        label="Nested parent link"
+        label="Recent..."
         childrenOffset={28}
       >
         <NavLink className={classes.menuItem} label="First child link" />
@@ -68,13 +53,35 @@ function NavMenu() {
       <NavLink
         defaultOpened
         className={classes.menuItem}
-        label="Nested parent link"
+        label="Record Types"
         childrenOffset={28}
       >
-        <NavLink className={classes.menuItem} label="First child link" />
-        <NavLink className={classes.menuItem} label="Second child link" />
-        <NavLink className={classes.menuItem} label="Third child link" />
+        {recordTypes?.map((item, id) => (
+          <NavLink
+            key={id}
+            className={classes.menuItem}
+            label={item.name}
+            active={active == "all-record" ? true : false}
+            onClick={() => {
+              setActive("all-record");
+              navigate(`all-record/${item.id}`);
+            }}
+          />
+        ))}
+
+        {/* <NavLink className={classes.menuItem} label="Hostels" />
+        <NavLink className={classes.menuItem} label="Marklist" /> */}
       </NavLink>
+      <NavLink
+        className={classes.menuItem}
+        label="Templates"
+        icon={<IconTable size="1rem" stroke={1.5} />}
+        active={active == "template" ? true : false}
+        onClick={() => {
+          setActive("template");
+          navigate("/");
+        }}
+      />
     </ScrollArea>
   );
 }

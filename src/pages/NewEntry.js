@@ -1,130 +1,185 @@
 import {
+  ActionIcon,
   Box,
   Button,
+  Code,
   createStyles,
+  Divider,
   Flex,
+  Group,
   NumberInput,
   Select,
+  Switch,
+  Text,
   TextInput,
   Title,
 } from "@mantine/core";
-import {
-  useForm,
-  isNotEmpty,
-  isEmail,
-  isInRange,
-  hasLength,
-  matches,
-} from "@mantine/form";
+import { useForm } from "@mantine/form";
+import { randomId } from "@mantine/hooks";
+import { IconTrash } from "@tabler/icons";
 import React from "react";
+import FormFields from "../utils/formFields";
+import CustomModal from "../components/CustomModal";
+import axios from "axios";
+import { useLocation, useNavigate } from "react-router";
+import FormStructure from "../utils/FormStructure";
 
-const useStyles = createStyles((theme) => ({
-  wrapper: {
-    background: theme.colors.customDark[2],
-    padding: 10,
-  },
-  select: {
-    width: "40%",
-  },
-}));
+function parse() {
+  return function (obj) {
+    const newObj = JSON.parse(obj);
+
+    return newObj;
+  };
+}
+
+function selectProps(...props) {
+  return function (obj) {
+    const newObj = {};
+    props.forEach((name) => {
+      newObj[name] = obj[name];
+    });
+
+    return newObj;
+  };
+}
 
 function NewEntry() {
-  const { classes } = useStyles();
+  const [opened, setOpened] = React.useState(false);
+  const [title, setTitle] = React.useState("");
+  const [message, setMessage] = React.useState("");
+  const navigate = useNavigate();
+  const { state } = useLocation();
+  const { TABLE } = state;
+
+  const fields = TABLE.map(parse());
+
+  const reducedFields = fields.map(selectProps("name", "key"));
+
   const form = useForm({
     initialValues: {
-      name: "",
-      job: "",
-      email: "",
-      favoriteColor: "",
-      age: 18,
+      fields: fields,
+      // fields: reducedFields,
     },
 
+    // functions will be used to validate values at corresponding key
     validate: {
-      name: hasLength({ min: 2, max: 10 }, "Name must be 2-10 characters long"),
-      job: isNotEmpty("Enter your current job"),
-      email: isEmail("Invalid email"),
-      favoriteColor: matches(
-        /^#([0-9a-f]{3}){1,2}$/,
-        "Enter a valid hex color"
-      ),
-      age: isInRange(
-        { min: 18, max: 99 },
-        "You must be 18-99 years old to register"
-      ),
+      fields: (value) => {
+        if (value.length < 1) {
+          setTitle("Error");
+          setMessage("Insert atleast one column to make the record type");
+          setOpened(true);
+        }
+      },
+      department: (value) => {
+        if (value.length < 1) {
+          setTitle("Error");
+          setMessage("Please enter department name");
+          setOpened(true);
+        }
+        if (value.length > 100) {
+          setTitle("Error");
+          setMessage("Please keep shorter department");
+          setOpened(true);
+        }
+      },
+      name: (value) => {
+        if (value.length < 1) {
+          setTitle("Error");
+          setMessage("Please enter Name");
+          setOpened(true);
+        }
+        if (value.length > 255) {
+          setTitle("Error");
+          setMessage("Please keep shorter name");
+          setOpened(true);
+        }
+      },
     },
   });
-  return (
-    <>
-      <div className={classes.wrapper}>
-        <Title order={3} mb={10}>
-          New Entry
-        </Title>
-        <Flex direction={"row"} justify="space-between">
-          <Select
-            className={classes.select}
-            placeholder="Select Report"
-            data={[
-              { value: "Lorem", label: "Lorem" },
-              { value: "Ipsum", label: "Ipsum" },
-              { value: "Dolor", label: "Dolor" },
-              { value: "Sit", label: "Sit" },
-              { value: "Amet", label: "Amet" },
-              { value: "Sec", label: "Sec" },
-              { value: "Mundus", label: "Mundus" },
-              { value: "Cretus", label: "Cretus" },
-              { value: "Est", label: "Est" },
-            ]}
-          />
-          <Flex gap={16}>
-            <Button bg={"green"}>Submit</Button>
-            <Button variant="outline" c={"red"}>
-              Reject
-            </Button>
-          </Flex>
-        </Flex>
-      </div>
-      <Box
-        component="form"
-        maw={400}
-        mx="auto"
-        onSubmit={form.onSubmit(() => {})}
+
+  const createRecordType = async (values) => {
+    let data = { ...values };
+    data.fields = JSON.stringify(data.fields);
+
+    try {
+      await axios({
+        method: "post",
+        url: `${process.env.REACT_APP_ROOT_URL}/api/recordtype/`,
+        headers: { Authorization: localStorage.getItem("SavedToken") },
+        data: data,
+      });
+      setTitle("Success");
+      setMessage("Record Type created");
+      setOpened(true);
+      // navigate("/");
+    } catch (error) {
+      setTitle("Error");
+      setMessage(error.response.data.error);
+      setOpened(true);
+    }
+  };
+
+  const subfield = form.values.fields.map((item, index) => {
+    return (
+      <Group
+        key={item.key}
+        my={"md"}
+        sx={(theme) => ({
+          padding: 10,
+          borderRadius: 10,
+          transitionDuration: "0.4s",
+          "&:hover": {
+            backgroundColor: theme.fn.darken("#f6f6f6", 0.1),
+          },
+        })}
       >
-        <TextInput
-          label="Name"
-          placeholder="Name"
-          withAsterisk
-          {...form.getInputProps("name")}
-        />
-        <TextInput
-          label="Your job"
-          placeholder="Your job"
-          withAsterisk
-          mt="md"
-          {...form.getInputProps("job")}
-        />
-        <TextInput
-          label="Your email"
-          placeholder="Your email"
-          withAsterisk
-          mt="md"
-          {...form.getInputProps("email")}
-        />
-        <TextInput
-          label="Your favorite color"
-          placeholder="Your favorite color"
-          withAsterisk
-          mt="md"
-          {...form.getInputProps("favoriteColor")}
-        />
-        <NumberInput
-          label="Your age"
-          placeholder="Your age"
-          withAsterisk
-          mt="md"
-          {...form.getInputProps("age")}
-        />
-      </Box>
-    </>
+        <Flex gap="sm" direction="row" align={"center"}>
+          <FormStructure item={item} form={form} index={index} />
+        </Flex>
+      </Group>
+    );
+  });
+
+  return (
+    <Flex
+      gap="md"
+      direction="column"
+      wrap="wrap"
+      sx={{ padding: 20, marginBottom: 30 }}
+    >
+      <form onSubmit={form.onSubmit(createRecordType)}>
+        <Flex direction="row" justify={"space-between"}>
+          <Title order={3} mb={10}>
+            New Record Type
+          </Title>
+          <Button type="submit" color="green">
+            Submit
+          </Button>
+        </Flex>
+        <Divider />
+
+        <Box component="form" maw={1200}>
+          {subfield.length > 0 ? null : (
+            <Text color="dimmed" align="center">
+              Insert atleast one column to make the record type
+            </Text>
+          )}
+          {subfield}
+
+          <Text size="sm" weight={500} mt="md">
+            Form values:
+          </Text>
+          <Code block>{JSON.stringify(form.values, null, 2)}</Code>
+
+          <CustomModal
+            opened={opened}
+            setOpened={setOpened}
+            title={title}
+            message={message}
+          />
+        </Box>
+      </form>
+    </Flex>
   );
 }
 

@@ -10,10 +10,14 @@ import Page404 from "../pages/Page404";
 import { UserContext } from "../utils/Context";
 import axios from "axios";
 import NavMenu from "../components/NavMenu";
-import AllReport from "../pages/AllReport";
-import ReportDetail from "../pages/ReportDetail";
 import NewEntry from "../pages/NewEntry";
 import NewReport from "../pages/NewReport";
+import GenReport from "../pages/GenReport";
+import BulkUpload from "../pages/BulkUpload";
+import NewRecordType from "../pages/NewRecordType";
+import AllRecord from "../pages/AllRecord";
+import Record from "../pages/Record";
+import UpdateRecordType from "../pages/UpdateRecordType";
 
 const useStyles = createStyles((theme) => ({
   navigationwrapper: {
@@ -50,7 +54,7 @@ function Navigation() {
   );
 
   const [userDetail, setUserDetail] = React.useState(null);
-  const [upcomingTrips, setUpcomingTrips] = React.useState(null);
+  const [recordTypes, setRecordTypes] = React.useState(null);
   const [pastTrips, setPastTrips] = React.useState(null);
   const [sentRequests, setSentRequests] = React.useState(null);
   const [recievedRequests, setRecievedRequests] = React.useState(null);
@@ -58,7 +62,7 @@ function Navigation() {
   React.useEffect(() => {
     if (loggedIn) {
       getUserData();
-      getupcomingTrips();
+      getRecordTypes();
       getPastTrips();
       getSentRequests();
       getRecievedRequests();
@@ -67,37 +71,31 @@ function Navigation() {
 
   const getUserData = React.useCallback(
     async (response) => {
-      const data = await axios.get(`${process.env.REACT_APP_ROOT_URL}/user/`, {
+      const data = await axios.get(`${process.env.REACT_APP_ROOT_URL}/users/`, {
         headers: { Authorization: localStorage.getItem("SavedToken") },
       });
+      console.log(data.data);
       setUserDetail(data.data);
     },
     [userDetail]
   );
 
-  const getupcomingTrips = React.useCallback(
+  const getRecordTypes = React.useCallback(
     async (response) => {
-      const data = await axios.get(
-        `${process.env.REACT_APP_ROOT_URL}/api/trip/upcoming`,
-        {
-          headers: { Authorization: localStorage.getItem("SavedToken") },
-        }
-      );
-      setUpcomingTrips(data.data);
-      data.data?.map(async (item) => {
-        if (new Date(item.departure_date) < new Date()) {
-          await axios({
-            method: "post",
-            url: `${process.env.REACT_APP_ROOT_URL}/api/trip/done`,
+      try {
+        const data = await axios.get(
+          `${process.env.REACT_APP_ROOT_URL}/api/recordtype/`,
+          {
             headers: { Authorization: localStorage.getItem("SavedToken") },
-            data: {
-              trip_id: item.id,
-            },
-          });
-        }
-      });
+          }
+        );
+        console.log(data.data);
+        setRecordTypes(data.data);
+      } catch (error) {
+        console.log(error.response.data.error);
+      }
     },
-    [upcomingTrips]
+    [recordTypes]
   );
 
   const getPastTrips = React.useCallback(
@@ -142,15 +140,15 @@ function Navigation() {
   const contextValue = React.useMemo(
     () => ({
       userDetail,
-      upcomingTrips,
-      setUpcomingTrips,
+      recordTypes,
+      setRecordTypes,
       pastTrips,
       sentRequests,
       setSentRequests,
       recievedRequests,
       setRecievedRequests,
     }),
-    [userDetail, upcomingTrips, pastTrips, sentRequests, recievedRequests]
+    [userDetail, recordTypes, pastTrips, sentRequests, recievedRequests]
   );
 
   return (
@@ -175,15 +173,22 @@ function Navigation() {
                       element={<Dashboard userDetail={userDetail} />}
                     />
                     <Route path="/landing" element={<LandingPage />} />
-                    <Route path="/all-report" element={<AllReport />} />
-                    <Route path="/report-detail" element={<ReportDetail />}>
-                      <Route
-                        path="/report-detail:id"
-                        element={<ReportDetail />}
-                      />
+                    <Route path="/new-recordtype" element={<NewRecordType />} />
+                    <Route
+                      path="/update-recordtype"
+                      element={<UpdateRecordType />}
+                    />
+                    <Route path="/all-record" element={<AllRecord />} />
+                    <Route path="/all-record" element={<AllRecord />}>
+                      <Route path="/all-record:id" element={<AllRecord />} />
+                    </Route>
+                    <Route path="/record" element={<Record />}>
+                      <Route path="/record:id" element={<Record />} />
                     </Route>
                     <Route path="/new-entry" element={<NewEntry />} />
                     <Route path="/new-report" element={<NewReport />} />
+                    <Route path="/generate-report" element={<GenReport />} />
+                    <Route path="/bulk-upload" element={<BulkUpload />} />
                     <Route path="*" element={<Page404 />} />
                   </Routes>
                 </Container>

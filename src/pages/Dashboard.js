@@ -30,6 +30,8 @@ import { useMediaQuery } from "@mantine/hooks";
 import { UserContext } from "../utils/Context";
 import { Carousel } from "@mantine/carousel";
 import { motion } from "framer-motion";
+import Container from "../components/Container";
+import { useNavigate } from "react-router";
 
 const useStyles = createStyles((theme) => ({
   Title: {
@@ -60,6 +62,10 @@ const useStyles = createStyles((theme) => ({
     },
   },
 
+  Button: {
+    margin: 8,
+  },
+
   carouselItem: {
     backgroundColor: theme.colors.customBlue[0],
     marginLeft: 15,
@@ -73,43 +79,22 @@ const useStyles = createStyles((theme) => ({
 }));
 
 function Dashboard() {
-  const { userDetail, upcomingTrips } = React.useContext(UserContext);
+  const { recordTypes } = React.useContext(UserContext);
   const { classes } = useStyles();
-  const [phone, setPhone] = React.useState(userDetail?.phone);
   const [error, setError] = React.useState(false);
   const [opened, setOpened] = React.useState(false);
   const [pageLoading, setPageLoading] = React.useState(false);
   const [accountToggle, setAccountToggle] = React.useState(false);
-
-  const Phone = async () => {
-    if (/^[1-9][0-9]{9}$/.test(phone)) {
-      setError(false);
-      await axios({
-        method: "patch",
-        url: `${process.env.REACT_APP_ROOT_URL}/user/phone`,
-        headers: { Authorization: localStorage.getItem("SavedToken") },
-        data: {
-          phone: phone,
-        },
-      });
-
-      setOpened(true);
-      setTimeout(() => {
-        setOpened(false);
-      }, 3000);
-    } else {
-      setError(true);
-    }
-  };
+  const navigate = useNavigate();
 
   const pageLoaded = React.useCallback(
     (response) => {
       setPageLoading(false);
     },
-    [pageLoading, upcomingTrips, userDetail]
+    [pageLoading, recordTypes]
   );
 
-  if (pageLoading && upcomingTrips && userDetail) {
+  if (pageLoading && recordTypes) {
     pageLoaded();
   }
 
@@ -118,66 +103,54 @@ function Dashboard() {
   const largeScreen = useMediaQuery("(min-width: 800px)");
 
   return !pageLoading ? (
-    <>
-      {[1, 2, 3, 4, 5, 6].map((item, id) => (
+    <Container>
+      <Flex justify={"end"}>
+        <Button
+          className={classes.Button}
+          onClick={() => navigate("/new-recordtype")}
+        >
+          Create New Record Type
+        </Button>
+      </Flex>
+      <Divider />
+      {recordTypes?.map((item, id) => (
         <Flex
           key={id}
           gap="md"
           direction="column"
           wrap="wrap"
-          sx={{ padding: 20, marginBottom: 30 }}
+          sx={{ marginBottom: 30 }}
         >
-          <Title order={3}>Report</Title>
-          <Carousel
-            height={210}
-            slideSize="33.333333%"
-            // loop
-            align="start"
-            slideGap={"lg"}
-            controlSize={34}
-            slidesToScroll={1}
-            sx={{}}
-          >
-            <MotionComp
-              whileHover={{ scale: 1.05 }}
-              className={classes.carouselItem}
+          <Title order={3}>{item?.name}</Title>
+
+          {item?.records.length > 0 ? (
+            <Carousel
+              height={210}
+              slideSize="33.333333%"
+              // loop
+              align="start"
+              slideGap={"lg"}
+              controlSize={34}
+              slidesToScroll={1}
+              sx={{}}
             >
-              1
-            </MotionComp>
-            <MotionComp
-              whileHover={{ scale: 1.05 }}
-              className={classes.carouselItem}
-            >
-              2
-            </MotionComp>
-            <MotionComp
-              whileHover={{ scale: 1.05 }}
-              className={classes.carouselItem}
-            >
-              3
-            </MotionComp>
-            <MotionComp
-              whileHover={{ scale: 1.05 }}
-              className={classes.carouselItem}
-            >
-              4
-            </MotionComp>
-            <MotionComp
-              whileHover={{ scale: 1.05 }}
-              className={classes.carouselItem}
-            >
-              5
-            </MotionComp>
-            <MotionComp
-              whileHover={{ scale: 1.05 }}
-              className={classes.carouselItem}
-            >
-              6
-            </MotionComp>
-          </Carousel>
+              {item?.records.map((item, id) => (
+                <MotionComp
+                  key={id}
+                  whileHover={{ scale: 1.05 }}
+                  className={classes.carouselItem}
+                  onClick={() => navigate(`/record/${item.id}`)}
+                >
+                  {item.name}
+                </MotionComp>
+              ))}
+            </Carousel>
+          ) : (
+            <Text>Nothing here...</Text>
+          )}
         </Flex>
       ))}
-    </>
+    </Container>
   ) : (
     <Center style={{ width: "100%", height: window.innerHeight - 68 }}>
       <Loader />

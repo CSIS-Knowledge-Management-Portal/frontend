@@ -3,12 +3,12 @@ import { createStyles } from "@mantine/core";
 
 const useStyles = createStyles((theme) => ({
   container: {
-    marginTop: 12,
+    // marginTop: 12,
     // marginBottom: 0,
     marginLeft: "auto",
     marginRight: "auto",
     width: "100%",
-    padding: 0,
+    padding: 10,
     // minHeight: window.innerHeight - 300 - 88,
 
     // [`@media (max-width: ${theme.breakpoints.xl}px)`]: {
